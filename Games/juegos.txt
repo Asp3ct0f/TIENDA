@@ -1,0 +1,5 @@
+1,The Legend of Zelda,Nintendo,59.99,23
+2,Super Mario Bros.,Nintendo,59.99,12
+3,Metroid Prime,Nintendo,59.99,13
+4,Donkey Kong Country,Nintendo,59.99,3
+5,Halo Infinite,Xbox,60.00,15
