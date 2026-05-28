@@ -1,0 +1,155 @@
+Fecha: 2026-05-27
+
+Usuario: Alexander
+
+=== DETALLE DE COMPRA ===
+4;Elden Ring;PC;999.50
+4;Elden Ring;PC;999.50
+4;Elden Ring;PC;999.50
+4;Elden Ring;PC;999.50
+4;Elden Ring;PC;999.50
+4;Elden Ring;PC;999.50
+4;Elden Ring;PC;999.50
+4;Elden Ring;PC;999.50
+4;Elden Ring;PC;999.50
+4;Elden Ring;PC;999.50
+------------------------------------
+Fecha: 2026-05-27
+
+Usuario: Roberto
+
+=== DETALLE DE COMPRA ===
+1;Halo Infinite;Xbox Series X;1199.00
+------------------------------------
+Fecha: 2026-05-27
+
+Usuario: Roberto
+
+=== DETALLE DE COMPRA ===
+6;Minecraft;PC;450.00
+------------------------------------
+Fecha: 2026-05-27
+
+Usuario: Roberto
+
+=== DETALLE DE COMPRA ===
+1;Halo Infinite;Xbox Series X;1199.00
+------------------------------------
+Fecha: 2026-05-27
+
+Usuario: Roberto
+
+=== DETALLE DE COMPRA ===
+8;Forza Horizon 5;Xbox Series X;1099.00
+------------------------------------
+Fecha: 2026-05-27
+
+Usuario: Roberto
+
+=== DETALLE DE COMPRA ===
+10;Spider-Man 2;PlayStation 5;1349.00
+------------------------------------
+Fecha: 2026-05-27
+
+Usuario: Roberto
+
+=== DETALLE DE COMPRA ===
+2;God of War Ragnarok;PlayStation 5;1349.00
+------------------------------------
+Fecha: 2026-05-27
+
+Usuario: Lalo
+
+=== DETALLE DE COMPRA ===
+11;Pragmata;PC;1299.00
+------------------------------------
+Fecha: 2026-05-27
+
+Usuario: Alo
+
+=== DETALLE DE COMPRA ===
+1;Halo Infinite;Xbox Series X;1199.00
+------------------------------------
+Fecha: 2026-05-27
+
+Usuario: Alondrx
+
+=== DETALLE DE COMPRA ===
+2;God of War Ragnarok;PlayStation 5;1349.00
+------------------------------------
+Fecha: 2026-05-27
+
+Usuario: Angel
+
+=== DETALLE DE COMPRA ===
+1;Halo Infinite;Xbox Series X;1199.00
+1;Halo Infinite;Xbox Series X;1199.00
+------------------------------------
+Fecha: 2026-05-27
+
+Usuario: angel
+
+=== DETALLE DE COMPRA ===
+7;Super Mario Bros. Wonder;Nintendo Switch;1200.00
+------------------------------------
+Fecha: 2026-05-27
+
+Usuario: angel
+
+=== DETALLE DE COMPRA ===
+1;Halo Infinite;Xbox Series X;1199.00
+------------------------------------
+Fecha: 2026-05-27
+
+Usuario: Angel
+
+=== DETALLE DE COMPRA ===
+1;Halo Infinite;Xbox Series X;1199.00
+3;The Legend of Zelda: Tears of the Kingdom;Nintendo Switch;1499.00
+------------------------------------
+Fecha: 2026-05-28
+
+Usuario: ANGEL
+
+=== DETALLE DE COMPRA ===
+1;Halo Infinite;Xbox Series X;1199.00
+2;God of War Ragnarok;PlayStation 5;1349.00
+------------------------------------
+Fecha: 2026-05-28
+
+Usuario: ANGEL
+
+=== DETALLE DE COMPRA ===
+1;Halo Infinite;Xbox Series X;1199.00
+------------------------------------
+Fecha: 2026-05-28
+
+Usuario: ANGEL
+
+=== DETALLE DE COMPRA ===
+2;God of War Ragnarok;PlayStation 5;1349.00
+2;God of War Ragnarok;PlayStation 5;1349.00
+------------------------------------
+Fecha: 2026-05-28
+
+Usuario: ANGEL
+
+=== DETALLE DE COMPRA ===
+2;God of War Ragnarok;PlayStation 5;1349.00
+------------------------------------
+Fecha: 2026-05-28
+
+Usuario: ANGEL
+
+=== DETALLE DE COMPRA ===
+3;The Legend of Zelda: Tears of the Kingdom;Nintendo Switch;1499.00
+4;Elden Ring;PC;999.50
+------------------------------------
+Fecha: 2026-05-28
+
+Usuario: Andres
+
+=== DETALLE DE COMPRA ===
+10;Spider-Man 2;PlayStation 5;1349.00
+6;Minecraft;PC;450.00
+------------------------------------

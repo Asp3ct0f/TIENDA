@@ -1,0 +1,8 @@
+Fecha: 2026-05-28
+
+Usuario: Andres
+
+=== DETALLE DE COMPRA ===
+10;Spider-Man 2;PlayStation 5;1349.00
+6;Minecraft;PC;450.00
+------------------------------------

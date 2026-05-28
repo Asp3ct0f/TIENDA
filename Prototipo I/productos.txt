@@ -1,0 +1,11 @@
+1;Halo Infinite;Xbox Series X;1199.00;5
+2;God of War Ragnarok;PlayStation 5;1349.00;10
+3;The Legend of Zelda: Tears of the Kingdom;Nintendo Switch;1499.00;5
+4;Elden Ring;PC;999.50;9
+5;Resident Evil 4 Remake;PlayStation 5;1199.00;7
+6;Minecraft;PC;450.00;48
+7;Super Mario Bros. Wonder;Nintendo Switch;1200.00;11
+8;Forza Horizon 5;Xbox Series X;1099.00;6
+10;Spider-Man 2;PlayStation 5;1349.00;22
+11;Pragmata;PC;1299.00;13
+12;Blob 2;Wii;500.00;30
