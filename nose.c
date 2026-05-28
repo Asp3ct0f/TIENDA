@@ -88,9 +88,9 @@ void down(int semid) {
     semop(semid, &op, 1);
 }
 
-/* ══════════════════════════════════════════════════════════════
+/*
    UTILIDADES ncurses (Estilo Matrix)
-   ══════════════════════════════════════════════════════════════ */
+  */
 
 /* Dibuja un recuadro con título centrado */
 void dibujar_ventana(WINDOW *w, const char *titulo) {
@@ -179,46 +179,82 @@ int leer_password(WINDOW *w, int fila, int col, char *buf, int max) {
         else if (pos < max - 1 && isprint(ch)) {
             buf[pos++] = ch;
             buf[pos] = '\0';
-            mvwaddch(w, fila, col + pos - 1, '#'); // Estilo Matrix: '#' en vez de '*'
+            mvwaddch(w, fila, col + pos - 1, '#'); // Estilo Matrix
         }
     }
     
     curs_set(0);
     return 1;
 }
-/* ══════════════════════════════════════════════════════════════
-   MENÚ GENÉRICO (Estilo Matrix)
-   ══════════════════════════════════════════════════════════════ */
+void dibujar_leyenda(const char *texto) {
+    int max_y, max_x;
+    getmaxyx(stdscr, max_y, max_x);
+
+    // Limpiar la última fila completa
+    move(max_y - 1, 0); 
+    clrtoeol();
+
+    // Aplicar estilo e imprimir centrado
+    attron(COLOR_PAIR(COLOR_TITULO) | A_DIM);
+    mvprintw(max_y - 1, (max_x - (int)strlen(texto)) / 2, "%s", texto);
+    attroff(COLOR_PAIR(COLOR_TITULO) | A_DIM);
+    
+    refresh(); 
+}
+
+
+
+/*
+  ================== MENÚ GENÉRICO (Estilo Matrix)
+  */
 int menu_navegar(WINDOW *w, const char **opciones, int n, const char *titulo) {
-    dibujar_ventana(w, titulo);
     int selec = 0;
-    int ancho = getmaxx(w);
+    int tecla;
+    int max_y, max_x;
+    
+    // Obtenemos dimensiones de la pantalla principal
+    getmaxyx(stdscr, max_y, max_x);
 
     while (1) {
+        // 1. Dibujar estructura de la ventana
+        dibujar_ventana(w, titulo);
+
+        // 2. Imprimir opciones dentro de la ventana 'w'
         for (int i = 0; i < n; i++) {
             if (i == selec) {
                 wattron(w, COLOR_PAIR(COLOR_SELEC) | A_BOLD);
-                /* Prompt cambiado a '>' para estilo terminal */
-                mvwprintw(w, 2 + i, 2, " > %-*s ", ancho - 7, opciones[i]);
+                mvwprintw(w, 2 + i, 2, " > %s ", opciones[i]);
                 wattroff(w, COLOR_PAIR(COLOR_SELEC) | A_BOLD);
             } else {
-                wattron(w, COLOR_PAIR(COLOR_NORMAL));
-                mvwprintw(w, 2 + i, 2, "   %-*s ", ancho - 7, opciones[i]);
-                wattroff(w, COLOR_PAIR(COLOR_NORMAL));
+                wattron(w, COLOR_PAIR(COLOR_NORMAL) | A_BOLD);
+                mvwprintw(w, 2 + i, 2, "   %s ", opciones[i]);
+                wattroff(w, COLOR_PAIR(COLOR_NORMAL) | A_BOLD);
             }
         }
-        /* Instrucciones abreviadas para estilo terminal */
-        wattron(w, COLOR_PAIR(COLOR_TITULO) | A_DIM);
-        mvwprintw(w, 2 + n + 1, 2, "[^/v] NAV  [ENT] EXE  [Q] EXIT");
-        wattroff(w, COLOR_PAIR(COLOR_TITULO) | A_DIM);
-        wrefresh(w);
+        wrefresh(w); // Refrescamos solo la ventana del menú
 
-        int tecla = wgetch(w);
-        if (tecla == KEY_RESIZE) return KEY_RESIZE;
-        if (tecla == KEY_UP)   selec = (selec - 1 + n) % n;
-        if (tecla == KEY_DOWN) selec = (selec + 1) % n;
-        if (tecla == '\n' || tecla == KEY_ENTER) return selec;
-        if (tecla == 'q' || tecla == 'Q') return -1;
+        // 3. Leyenda fija en la última línea de la terminal (stdscr)
+        move(max_y - 1, 0); 
+        clrtoeol(); // Limpiamos cualquier residuo previo
+        
+        attron(COLOR_PAIR(COLOR_TITULO) | A_DIM);
+        char *texto = "ENTER: Seleccionar | FLECHAS: Navegar | ESC: Salir";
+        mvprintw(max_y - 1, (max_x - (int)strlen(texto)) / 2, "%s", texto);
+        attroff(COLOR_PAIR(COLOR_TITULO) | A_DIM);
+        
+        refresh(); // Refrescamos la pantalla completa
+
+        // 4. Captura única de teclas
+        tecla = wgetch(w);
+
+        if (tecla == KEY_RESIZE) {
+            getmaxyx(stdscr, max_y, max_x); // Actualizamos límites tras redimensionar
+            return KEY_RESIZE;
+        }
+        else if (tecla == KEY_UP) selec = (selec - 1 + n) % n;
+        else if (tecla == KEY_DOWN) selec = (selec + 1) % n;
+        else if (tecla == 10 || tecla == KEY_ENTER) return selec;
+        else if (tecla == 27) return -1; // ESC para salir
     }
 }
 
@@ -238,12 +274,12 @@ void banner(void) {
     mvhline(8, 5, '-', max_x - 10);
     mvprintw(8, max_x - 5, ">");
     
-    refresh(); // Asegura que se pinte en pantalla
+    refresh();
 }
 
-/* ══════════════════════════════════════════════════════════════
-   PANTALLA: Menú inicial (Login / Registro / Salir)
-   ══════════════════════════════════════════════════════════════ */
+/* 
+ ================  PANTALLA: Menú inicial (Login / Registro / Salir)
+  */
 int pantalla_menu_inicial(void) {
     int r = KEY_RESIZE; // Iniciamos en KEY_RESIZE para forzar el primer dibujado
     int filas, cols;
@@ -272,9 +308,9 @@ int pantalla_menu_inicial(void) {
     }
     return r; // Retorna la opción elegida (0, 1, 2) cuando el usuario presiona ENTER
 }
-/* ══════════════════════════════════════════════════════════════
-   PANTALLA: Formulario de Login / Registro (Estilo Matrix)
-   ══════════════════════════════════════════════════════════════ */
+/* 
+  ====================== PANTALLA: Formulario de Login / Registro (Estilo Matrix)
+   */
 void pantalla_login(char *usuario, char *password, char *correo, int es_registro) {
     int filas, cols;
     getmaxyx(stdscr, filas, cols);
@@ -290,18 +326,18 @@ void pantalla_login(char *usuario, char *password, char *correo, int es_registro
     dibujar_ventana(w, titulo);
 
     wattron(w, COLOR_PAIR(COLOR_TITULO));
-    mvwprintw(w, 2, 2, "ROOT@USER >");
+    mvwprintw(w, 2, 2, "NOMBRE >");
     wattroff(w, COLOR_PAIR(COLOR_TITULO));
     leer_cadena(w, 3, 2, usuario, 50);
 
     wattron(w, COLOR_PAIR(COLOR_TITULO));
-    mvwprintw(w, 5, 2, "KEY@PASS  >");
+    mvwprintw(w, 5, 2, "CONTRASENA >");
     wattroff(w, COLOR_PAIR(COLOR_TITULO));
     leer_password(w, 6, 2, password, 100);
 
     if (es_registro) {
         wattron(w, COLOR_PAIR(COLOR_TITULO));
-        mvwprintw(w, 8, 2, "MAIL@ADDR >");
+        mvwprintw(w, 8, 2, "CORREO >");
         wattroff(w, COLOR_PAIR(COLOR_TITULO));
         leer_cadena(w, 9, 2, correo, 70);
     }
@@ -310,9 +346,9 @@ void pantalla_login(char *usuario, char *password, char *correo, int es_registro
     clear();
     refresh();
 }
-/* ══════════════════════════════════════════════════════════════
-   PANTALLA: Menú de usuario normal (Estilo Matrix)
-   ══════════════════════════════════════════════════════════════ */
+/* 
+  ==================== PANTALLA: Menú de usuario normal (Estilo Matrix)
+   */
 int pantalla_menu_usuario(const char *nombre) {
     int filas, cols;
     getmaxyx(stdscr, filas, cols);
@@ -346,9 +382,9 @@ int pantalla_menu_usuario(const char *nombre) {
 }
 
 
-/* ══════════════════════════════════════════════════════════════
-   PANTALLA: Menú de administrador
-   ══════════════════════════════════════════════════════════════ */
+/* 
+  =================== PANTALLA: Menú de administrador
+   */
 int pantalla_menu_admin(void) {
     int filas, cols;
     getmaxyx(stdscr, filas, cols);
@@ -381,9 +417,9 @@ int pantalla_menu_admin(void) {
     refresh();
     return r; /* 0-12 */
 }
-/* ══════════════════════════════════════════════════════════════
-   PANTALLA: Catálogo de productos (Estilo Matrix)
-   ══════════════════════════════════════════════════════════════ */
+/* 
+  ================= PANTALLA: Catálogo de productos (Estilo Matrix)
+   */
 int pantalla_catalogo(struct Productos *lista, int total, int *cantidad_out) {
     int filas, cols;
     getmaxyx(stdscr, filas, cols);
@@ -396,11 +432,11 @@ int pantalla_catalogo(struct Productos *lista, int total, int *cantidad_out) {
 
     WINDOW *w = newwin(alto, ancho, y0, x0);
     keypad(w, TRUE);
-    dibujar_ventana(w, "CATALOGO_DB");
+    dibujar_ventana(w, "CATALOGO");
 
     /* Encabezado de columnas: Estilo tabla de datos */
     wattron(w, COLOR_PAIR(COLOR_BORDE) | A_BOLD);
-    mvwprintw(w, 1, 2, "ID  %-28s %-14s  PRICE    STOCK", "TITLE", "PLATFORM");
+    mvwprintw(w, 1, 2, "ID  %-28s %-14s  PRECIO    DISPONIBLE", "NOMBRE", "PLATAFORMA");
     wattroff(w, COLOR_PAIR(COLOR_BORDE) | A_BOLD);
 
     int selec = 0;
@@ -416,15 +452,13 @@ int pantalla_catalogo(struct Productos *lista, int total, int *cantidad_out) {
             if (i == selec) wattroff(w, COLOR_PAIR(COLOR_SELEC) | A_BOLD);
             else            wattroff(w, COLOR_PAIR(COLOR_NORMAL));
         }
-        wattron(w, A_DIM | COLOR_PAIR(COLOR_TITULO));
-        mvwprintw(w, alto - 2, 2, "[^/v] NAV  [ENT] BUY  [Q] BACK");
-        wattroff(w, A_DIM | COLOR_PAIR(COLOR_TITULO));
+        dibujar_leyenda("ENTER: Seleccionar | FLECHAS: Navegar | ESC: Salir");
         wrefresh(w);
 
         int tecla = wgetch(w);
         if (tecla == KEY_UP)   selec = (selec - 1 + total) % total;
         else if (tecla == KEY_DOWN) selec = (selec + 1) % total;
-        else if (tecla == 'q' || tecla == 'Q') { delwin(w); clear(); refresh(); return -1; }
+        else if (tecla == 'q' || tecla == 27) { delwin(w); clear(); refresh(); return -1; }
         else if (tecla == '\n' || tecla == KEY_ENTER) {
             /* Pedir cantidad en ventana pequeña */
             WINDOW *wc = newwin(7, 44, y0 + alto/2, x0 + 14);
@@ -454,9 +488,9 @@ int pantalla_catalogo(struct Productos *lista, int total, int *cantidad_out) {
     }
 }
 
-/* ══════════════════════════════════════════════════════════════
-   PANTALLA: Carrito de compras (Estilo Matrix)
-   ══════════════════════════════════════════════════════════════ */
+/* 
+ ====================  PANTALLA: Carrito de compras (Estilo Matrix)
+   */
 int pantalla_carrito(struct Productos *carrito, int total, float costo_total) {
     int filas, cols;
     getmaxyx(stdscr, filas, cols);
@@ -468,10 +502,10 @@ int pantalla_carrito(struct Productos *carrito, int total, float costo_total) {
 
     WINDOW *w = newwin(alto, ancho, y0, x0);
     keypad(w, TRUE);
-    dibujar_ventana(w, "SHOPPING_CART");
+    dibujar_ventana(w, "CARRITO DE COMPRAS");
 
     wattron(w, COLOR_PAIR(COLOR_BORDE) | A_BOLD);
-    mvwprintw(w, 1, 2, "ID  %-28s %-14s  PRICE", "TITLE", "PLATFORM");
+    mvwprintw(w, 1, 2, "ID  %-28s %-14s  PRECIO", "NOMBRE", "PLATAFORMA");
     wattroff(w, COLOR_PAIR(COLOR_BORDE) | A_BOLD);
 
     for (int i = 0; i < total; i++) {
@@ -490,8 +524,8 @@ int pantalla_carrito(struct Productos *carrito, int total, float costo_total) {
     /* Confirmación con mini-menú */
     WINDOW *wm = newwin(7, 36, y0 + alto/2, x0 + 16);
     keypad(wm, TRUE);
-    const char *opts[] = {"Confirm", "Cancel"};
-    int r = menu_navegar(wm, opts, 2, "PROCEED?");
+    const char *opts[] = {"Aceptar", "Cancelar"};
+    int r = menu_navegar(wm, opts, 2, "Continuar?");
     delwin(wm);
     delwin(w);
     clear();
@@ -499,9 +533,9 @@ int pantalla_carrito(struct Productos *carrito, int total, float costo_total) {
     return (r == 0) ? 1 : 0;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   PANTALLA: Visualización de texto largo (historial, reportes, etc.)
-   ══════════════════════════════════════════════════════════════ */
+/* 
+   ======================PANTALLA: Visualización de texto largo (historial, reportes, etc.)
+*/
 void pantalla_texto(const char *titulo, const char *texto) {
     int filas, cols;
     getmaxyx(stdscr, filas, cols);
@@ -509,45 +543,50 @@ void pantalla_texto(const char *titulo, const char *texto) {
     int alto = filas - 4, ancho = cols - 4;
     WINDOW *w = newwin(alto, ancho, 2, 2);
     keypad(w, TRUE);
-    scrollok(w, TRUE); // Activamos scroll
     dibujar_ventana(w, titulo);
 
-    wattron(w, COLOR_PAIR(COLOR_NORMAL));
-    
-    // Aumentamos el tamaño si el reporte es muy largo
-    // Nota: Si tu memoria->productos es de 4096, pon esto a 4096
-    char copia[4096]; 
+    char copia[4096];
     strncpy(copia, texto, sizeof(copia) - 1);
     copia[sizeof(copia) - 1] = '\0';
 
     char *linea = strtok(copia, "\n");
-    int fila_actual = 2; // Empezamos un poco abajo del título
-    
+    int fila_actual = 2;
+
     while (linea != NULL) {
-        // Si el texto llega al fondo de la ventana, el scroll automático de ncurses lo manejará
         if (fila_actual >= alto - 2) {
+            // Antes de limpiar, apagamos el color
+            wattroff(w, COLOR_PAIR(COLOR_NORMAL));
+            
             mvwprintw(w, alto - 2, 2, "-- Más abajo --");
             wrefresh(w);
-            wgetch(w); // Espera tecla para ver el resto
-            wclear(w); // Limpia la ventana
+            wgetch(w);
+            wclear(w);
             dibujar_ventana(w, titulo);
             fila_actual = 2;
         }
+
+        // Activamos el color ANTES de imprimir cada línea
+        wattron(w, COLOR_PAIR(COLOR_NORMAL));
         mvwprintw(w, fila_actual++, 2, "%s", linea);
+        wattroff(w, COLOR_PAIR(COLOR_NORMAL));
+        
         linea = strtok(NULL, "\n");
     }
-    wattroff(w, COLOR_PAIR(COLOR_NORMAL));
 
+    // Pie de página con color
+    wattron(w, COLOR_PAIR(COLOR_NORMAL));
     mvwprintw(w, alto - 1, 2, "Presione cualquier tecla para regresar...");
+    wattroff(w, COLOR_PAIR(COLOR_NORMAL));
+    
     wrefresh(w);
     wgetch(w);
     delwin(w);
     clear();
     refresh();
 }
-/* ══════════════════════════════════════════════════════════════
-   PANTALLA: Formulario genérico (Estilo Matrix)
-   ══════════════════════════════════════════════════════════════ */
+/* 
+   ===============PANTALLA: Formulario genérico (Estilo Matrix)
+*/
 int pantalla_formulario(const char *titulo, const char **campos, char **valores, 
                         const int *maxlen, const int *es_pass, int n_campos) 
 {
@@ -583,9 +622,10 @@ int pantalla_formulario(const char *titulo, const char **campos, char **valores,
     return exito;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   MAIN
-   ══════════════════════════════════════════════════════════════ */
+/* 
+ ===============  MAIN================
+*/
+
 int main(void) {
 
 
@@ -634,9 +674,9 @@ int main(void) {
     char usuario_actual[50] = {0};
     int  mi_rol_admin       = 0;
 
-    /* ══════════════════════════════════════════════════════════
-       BUCLE MENÚ INICIAL (Login / Registro)
-       ══════════════════════════════════════════════════════════ */
+    /* 
+       ====================BUCLE MENÚ INICIAL (Login / Registro)
+    */
     while (!sesion_iniciada) {
         int opcion_ini = pantalla_menu_inicial();
 
@@ -676,9 +716,9 @@ int main(void) {
         }
     }
 
-    /* ══════════════════════════════════════════════════════════
-       BUCLE MENÚ PRINCIPAL (usuario / admin)
-       ══════════════════════════════════════════════════════════ */
+    /* 
+       ==================BUCLE MENÚ PRINCIPAL (usuario / admin)
+     */
     while (sesion_iniciada) {
 
         int opcion = mi_rol_admin
@@ -698,9 +738,9 @@ int main(void) {
             break;
         }
 
-        /* ════════════════════════════════════════════════════
-           OPCIONES USUARIO
-           ════════════════════════════════════════════════════ */
+        /* 
+           ==============OPCIONES USUARIO
+         */
 
         /* [0] Ver catálogo */
         if (!mi_rol_admin && opcion == 0) {
@@ -862,9 +902,9 @@ int main(void) {
             esperar_enter();
         }
 
-        /* ════════════════════════════════════════════════════
-           OPCIONES ADMINISTRADOR
-           ════════════════════════════════════════════════════ */
+        /* 
+          ========================= OPCIONES ADMINISTRADOR
+          */
 
         /* [0] Ver catálogo admin */
         else if (mi_rol_admin && opcion == 0) {
