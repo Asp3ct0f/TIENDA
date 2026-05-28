@@ -78,5 +78,29 @@ Producto: God of War Ragnarok
 Plataforma: PlayStation 5
 Precio: 1349.00
 
+Producto: Halo Infinite
+Plataforma: Xbox Series X
+Precio: 1199.00
+
+Producto: Halo Infinite
+Plataforma: Xbox Series X
+Precio: 1199.00
+
+Producto: Super Mario Bros. Wonder
+Plataforma: Nintendo Switch
+Precio: 1200.00
+
+Producto: Halo Infinite
+Plataforma: Xbox Series X
+Precio: 1199.00
+
+Producto: Halo Infinite
+Plataforma: Xbox Series X
+Precio: 1199.00
+
+Producto: The Legend of Zelda: Tears of the Kingdom
+Plataforma: Nintendo Switch
+Precio: 1499.00
+
 ====================================
-TOTAL VENDIDO: 20487.00
+TOTAL VENDIDO: 27982.00

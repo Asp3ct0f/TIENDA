@@ -32,12 +32,29 @@
 #define MODIFICAR_MI_CUENTA 19
 
 /* ── Colores ──────────────────────────────────────────────── */
-#define COLOR_TITULO   1   /* cyan sobre negro   */
-#define COLOR_NORMAL   2   /* blanco sobre negro */
-#define COLOR_SELEC    3   /* negro sobre cyan   */
-#define COLOR_ERROR    4   /* rojo sobre negro   */
-#define COLOR_OK       5   /* verde sobre negro  */
-#define COLOR_BORDE    6   /* amarillo sobre negro */
+#ifndef CONFIG_UI_H
+#define CONFIG_UI_H
+
+#define COLOR_TITULO   1
+#define COLOR_NORMAL   2
+#define COLOR_SELEC    3
+#define COLOR_ERROR    4
+#define COLOR_OK       5
+#define COLOR_BORDE    6
+
+// Función para inicializar los colores una sola vez
+void inicializar_colores() {
+    start_color();
+    init_pair(COLOR_TITULO, COLOR_GREEN, COLOR_BLACK);
+    init_pair(COLOR_NORMAL, COLOR_GREEN, COLOR_BLACK);
+    init_pair(COLOR_SELEC,  COLOR_BLACK, COLOR_GREEN);
+    init_pair(COLOR_ERROR,  COLOR_RED,   COLOR_BLACK);
+    init_pair(COLOR_OK,     COLOR_GREEN, COLOR_BLACK);
+    init_pair(COLOR_BORDE,  COLOR_GREEN, COLOR_BLACK);
+}
+
+#endif
+
 
 struct Productos {
     int   id;
@@ -72,7 +89,7 @@ void down(int semid) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   UTILIDADES ncurses
+   UTILIDADES ncurses (Estilo Matrix)
    ══════════════════════════════════════════════════════════════ */
 
 /* Dibuja un recuadro con título centrado */
@@ -102,7 +119,7 @@ void mostrar_mensaje(const char *msg, int es_error) {
         attron(COLOR_PAIR(COLOR_ERROR) | A_BOLD);
     else
         attron(COLOR_PAIR(COLOR_OK) | A_BOLD);
-    mvprintw(filas - 2, 2, "%s", msg);
+    mvprintw(filas - 2, 2, "[SYS] %s", msg); // Prefijo estilo terminal
     if (es_error)
         attroff(COLOR_PAIR(COLOR_ERROR) | A_BOLD);
     else
@@ -115,7 +132,7 @@ void esperar_enter(void) {
     int filas, cols;
     getmaxyx(stdscr, filas, cols);
     attron(COLOR_PAIR(COLOR_NORMAL) | A_DIM);
-    mvprintw(filas - 1, 2, "Presione ENTER para continuar...");
+    mvprintw(filas - 1, 2, "> PRESS [ENTER] TO CONTINUE...");
     attroff(COLOR_PAIR(COLOR_NORMAL) | A_DIM);
     refresh();
     /* Consumir hasta ENTER */
@@ -142,43 +159,35 @@ int leer_password(WINDOW *w, int fila, int col, char *buf, int max) {
     int ch, pos = 0;
     buf[0] = '\0';
     wmove(w, fila, col);
-    wclrtoeol(w); // Limpiamos la línea antes de empezar
+    wclrtoeol(w);
     
-    // NO usamos echo(), queremos controlar lo que se ve manualmente
     noecho(); 
     curs_set(1);
 
     while (1) {
         ch = wgetch(w);
         
-        // Detección de salida
         if (ch == 'q' || ch == 'Q') return 0;
-        
-        // Confirmar con Enter
         if (ch == '\n') break;
         
-        // Manejo de Backspace
         if ((ch == KEY_BACKSPACE || ch == 127) && pos > 0) {
             pos--;
             buf[pos] = '\0';
-            mvwprintw(w, fila, col + pos, " "); // Borra el asterisco visual
+            mvwprintw(w, fila, col + pos, " ");
             wmove(w, fila, col + pos);
         } 
-        // Captura de caracteres normales
         else if (pos < max - 1 && isprint(ch)) {
             buf[pos++] = ch;
             buf[pos] = '\0';
-            mvwaddch(w, fila, col + pos - 1, '*'); // Solo dibuja el asterisco
+            mvwaddch(w, fila, col + pos - 1, '#'); // Estilo Matrix: '#' en vez de '*'
         }
     }
     
     curs_set(0);
     return 1;
 }
-
 /* ══════════════════════════════════════════════════════════════
-   MENÚ GENÉRICO (navegar con ↑↓, confirmar con ENTER)
-   Retorna el índice seleccionado (0-based) o -1 si se presiona 'q'
+   MENÚ GENÉRICO (Estilo Matrix)
    ══════════════════════════════════════════════════════════════ */
 int menu_navegar(WINDOW *w, const char **opciones, int n, const char *titulo) {
     dibujar_ventana(w, titulo);
@@ -189,21 +198,23 @@ int menu_navegar(WINDOW *w, const char **opciones, int n, const char *titulo) {
         for (int i = 0; i < n; i++) {
             if (i == selec) {
                 wattron(w, COLOR_PAIR(COLOR_SELEC) | A_BOLD);
-                mvwprintw(w, 2 + i, 2, " %-*s ", ancho - 6, opciones[i]);
+                /* Prompt cambiado a '>' para estilo terminal */
+                mvwprintw(w, 2 + i, 2, " > %-*s ", ancho - 7, opciones[i]);
                 wattroff(w, COLOR_PAIR(COLOR_SELEC) | A_BOLD);
             } else {
                 wattron(w, COLOR_PAIR(COLOR_NORMAL));
-                mvwprintw(w, 2 + i, 2, " %-*s ", ancho - 6, opciones[i]);
+                mvwprintw(w, 2 + i, 2, "   %-*s ", ancho - 7, opciones[i]);
                 wattroff(w, COLOR_PAIR(COLOR_NORMAL));
             }
         }
-        /* Instrucciones */
+        /* Instrucciones abreviadas para estilo terminal */
         wattron(w, COLOR_PAIR(COLOR_TITULO) | A_DIM);
-        mvwprintw(w, 2 + n + 1, 2, "↑↓ Navegar   ENTER Seleccionar   q Salir");
+        mvwprintw(w, 2 + n + 1, 2, "[^/v] NAV  [ENT] EXE  [Q] EXIT");
         wattroff(w, COLOR_PAIR(COLOR_TITULO) | A_DIM);
         wrefresh(w);
 
         int tecla = wgetch(w);
+        if (tecla == KEY_RESIZE) return KEY_RESIZE;
         if (tecla == KEY_UP)   selec = (selec - 1 + n) % n;
         if (tecla == KEY_DOWN) selec = (selec + 1) % n;
         if (tecla == '\n' || tecla == KEY_ENTER) return selec;
@@ -211,30 +222,58 @@ int menu_navegar(WINDOW *w, const char **opciones, int n, const char *titulo) {
     }
 }
 
+void banner(void) {
+    int max_y, max_x;
+    getmaxyx(stdscr, max_y, max_x); // Obtiene el tamaño actual de la pantalla
+
+    attron(COLOR_PAIR(COLOR_TITULO)| A_BOLD);
+
+    mvprintw(2, (max_x - 43) / 2, "  ____    _    __  __  _____ ____  _   _ __  __ ");
+    mvprintw(3, (max_x - 43) / 2, " / ___|  / \\  |  \\/  || ____| __ )| | | |\\ \\/ / ");
+    mvprintw(4, (max_x - 43) / 2, "| |  _  / _ \\ | |\\/| ||  _| |  _ \\| | | | \\  /  ");
+    mvprintw(5, (max_x - 43) / 2, "| |_| |/ ___ \\| |  | || |___| |_) | |_| | / / ");
+    mvprintw(6, (max_x - 43) / 2, " \\____/_/   \\_\\_|  |_||_____|____/ \\___/ /_/ ");
+    
+    mvprintw(8, 4, "<");
+    mvhline(8, 5, '-', max_x - 10);
+    mvprintw(8, max_x - 5, ">");
+    
+    refresh(); // Asegura que se pinte en pantalla
+}
+
 /* ══════════════════════════════════════════════════════════════
    PANTALLA: Menú inicial (Login / Registro / Salir)
    ══════════════════════════════════════════════════════════════ */
 int pantalla_menu_inicial(void) {
+    int r = KEY_RESIZE; // Iniciamos en KEY_RESIZE para forzar el primer dibujado
     int filas, cols;
-    getmaxyx(stdscr, filas, cols);
-
     int alto = 10, ancho = 40;
-    int y0   = (filas - alto) / 2;
-    int x0   = (cols  - ancho) / 2;
 
-    WINDOW *w = newwin(alto, ancho, y0, x0);
-    keypad(w, TRUE);
+    // Este bucle solo se repetirá si el usuario redimensiona la ventana
+    while (r == KEY_RESIZE) {
+        clear();
+        banner(); 
+        getmaxyx(stdscr, filas, cols);
 
-    const char *opciones[] = {"Iniciar sesion", "Registrarse", "Salir"};
-    int r = menu_navegar(w, opciones, 3, "VIDEOJUEGOS");
-    delwin(w);
-    clear();
-    refresh();
-    return r; /* 0=Login 1=Registro 2=Salir */
+        int fin_banner = 9;
+        int espacio_libre = filas - fin_banner;
+        int y0 = fin_banner + (espacio_libre - alto) / 2;
+        int x0 = (cols - ancho) / 2;
+
+        WINDOW *w = newwin(alto, ancho, y0, x0);
+        keypad(w, TRUE);
+
+        const char *opciones[] = {"[LOG] INICIAR SESION", "[REG] REGISTRARSE", "[EXIT] SALIR DEL SISTEMA"};
+        
+        // Aquí pasamos el control al menú de navegación
+        r = menu_navegar(w, opciones, 3, "VIDEOJUEGOS");
+        
+        delwin(w); // Limpiamos la ventana antes de volver a dibujar
+    }
+    return r; // Retorna la opción elegida (0, 1, 2) cuando el usuario presiona ENTER
 }
-
 /* ══════════════════════════════════════════════════════════════
-   PANTALLA: Formulario de Login / Registro
+   PANTALLA: Formulario de Login / Registro (Estilo Matrix)
    ══════════════════════════════════════════════════════════════ */
 void pantalla_login(char *usuario, char *password, char *correo, int es_registro) {
     int filas, cols;
@@ -251,18 +290,18 @@ void pantalla_login(char *usuario, char *password, char *correo, int es_registro
     dibujar_ventana(w, titulo);
 
     wattron(w, COLOR_PAIR(COLOR_TITULO));
-    mvwprintw(w, 2, 2, "Usuario:");
+    mvwprintw(w, 2, 2, "ROOT@USER >");
     wattroff(w, COLOR_PAIR(COLOR_TITULO));
     leer_cadena(w, 3, 2, usuario, 50);
 
     wattron(w, COLOR_PAIR(COLOR_TITULO));
-    mvwprintw(w, 5, 2, "Password:");
+    mvwprintw(w, 5, 2, "KEY@PASS  >");
     wattroff(w, COLOR_PAIR(COLOR_TITULO));
     leer_password(w, 6, 2, password, 100);
 
     if (es_registro) {
         wattron(w, COLOR_PAIR(COLOR_TITULO));
-        mvwprintw(w, 8, 2, "Correo:");
+        mvwprintw(w, 8, 2, "MAIL@ADDR >");
         wattroff(w, COLOR_PAIR(COLOR_TITULO));
         leer_cadena(w, 9, 2, correo, 70);
     }
@@ -271,17 +310,16 @@ void pantalla_login(char *usuario, char *password, char *correo, int es_registro
     clear();
     refresh();
 }
-
 /* ══════════════════════════════════════════════════════════════
-   PANTALLA: Menú de usuario normal
+   PANTALLA: Menú de usuario normal (Estilo Matrix)
    ══════════════════════════════════════════════════════════════ */
 int pantalla_menu_usuario(const char *nombre) {
     int filas, cols;
     getmaxyx(stdscr, filas, cols);
 
-    /* Encabezado */
+    /* Encabezado: Estilo Terminal Hacking */
     attron(COLOR_PAIR(COLOR_TITULO) | A_BOLD);
-    mvprintw(1, (cols - 30) / 2, "  Bienvenid@ %s  ", nombre);
+    mvprintw(1, (cols - 30) / 2, ">> ACCESS GRANTED: %s <<", nombre);
     attroff(COLOR_PAIR(COLOR_TITULO) | A_BOLD);
     refresh();
 
@@ -306,6 +344,7 @@ int pantalla_menu_usuario(const char *nombre) {
     refresh();
     return r; /* 0-5 */
 }
+
 
 /* ══════════════════════════════════════════════════════════════
    PANTALLA: Menú de administrador
@@ -342,9 +381,8 @@ int pantalla_menu_admin(void) {
     refresh();
     return r; /* 0-12 */
 }
-
 /* ══════════════════════════════════════════════════════════════
-   PANTALLA: Catálogo de productos (con selección por flechas)
+   PANTALLA: Catálogo de productos (Estilo Matrix)
    ══════════════════════════════════════════════════════════════ */
 int pantalla_catalogo(struct Productos *lista, int total, int *cantidad_out) {
     int filas, cols;
@@ -358,11 +396,11 @@ int pantalla_catalogo(struct Productos *lista, int total, int *cantidad_out) {
 
     WINDOW *w = newwin(alto, ancho, y0, x0);
     keypad(w, TRUE);
-    dibujar_ventana(w, "CATALOGO DE VIDEOJUEGOS");
+    dibujar_ventana(w, "CATALOGO_DB");
 
-    /* Encabezado de columnas */
+    /* Encabezado de columnas: Estilo tabla de datos */
     wattron(w, COLOR_PAIR(COLOR_BORDE) | A_BOLD);
-    mvwprintw(w, 1, 2, "ID  %-28s %-14s  Precio   Stock", "TITULO", "PLATAFORMA");
+    mvwprintw(w, 1, 2, "ID  %-28s %-14s  PRICE    STOCK", "TITLE", "PLATFORM");
     wattroff(w, COLOR_PAIR(COLOR_BORDE) | A_BOLD);
 
     int selec = 0;
@@ -371,7 +409,7 @@ int pantalla_catalogo(struct Productos *lista, int total, int *cantidad_out) {
             if (i == selec) wattron(w, COLOR_PAIR(COLOR_SELEC) | A_BOLD);
             else            wattron(w, COLOR_PAIR(COLOR_NORMAL));
 
-            mvwprintw(w, 2 + i, 2, "%-3d %-28s %-14s $%7.2f  %3d",
+            mvwprintw(w, 2 + i, 2, "%-3d %-28.28s %-14.14s $%7.2f  %3d",
                       lista[i].id, lista[i].nombre, lista[i].plataforma,
                       lista[i].precio, lista[i].stock);
 
@@ -379,31 +417,31 @@ int pantalla_catalogo(struct Productos *lista, int total, int *cantidad_out) {
             else            wattroff(w, COLOR_PAIR(COLOR_NORMAL));
         }
         wattron(w, A_DIM | COLOR_PAIR(COLOR_TITULO));
-        mvwprintw(w, alto - 2, 2, "↑↓ Navegar   ENTER Seleccionar   q Volver");
+        mvwprintw(w, alto - 2, 2, "[^/v] NAV  [ENT] BUY  [Q] BACK");
         wattroff(w, A_DIM | COLOR_PAIR(COLOR_TITULO));
         wrefresh(w);
 
         int tecla = wgetch(w);
         if (tecla == KEY_UP)   selec = (selec - 1 + total) % total;
-        if (tecla == KEY_DOWN) selec = (selec + 1) % total;
-        if (tecla == 'q' || tecla == 'Q') { delwin(w); clear(); refresh(); return -1; }
-        if (tecla == '\n' || tecla == KEY_ENTER) {
-            /* Pedir cantidad en una ventanita pequeña */
+        else if (tecla == KEY_DOWN) selec = (selec + 1) % total;
+        else if (tecla == 'q' || tecla == 'Q') { delwin(w); clear(); refresh(); return -1; }
+        else if (tecla == '\n' || tecla == KEY_ENTER) {
+            /* Pedir cantidad en ventana pequeña */
             WINDOW *wc = newwin(7, 44, y0 + alto/2, x0 + 14);
             keypad(wc, TRUE);
-            dibujar_ventana(wc, "CANTIDAD");
+            dibujar_ventana(wc, "TRANSACTION");
             wattron(wc, COLOR_PAIR(COLOR_TITULO));
-            mvwprintw(wc, 2, 2, "Stock disponible: %d", lista[selec].stock);
-            mvwprintw(wc, 3, 2, "Cantidad: ");
+            mvwprintw(wc, 2, 2, "> Stock Available: %d", lista[selec].stock);
+            mvwprintw(wc, 3, 2, "> Input Quantity : ");
             wattroff(wc, COLOR_PAIR(COLOR_TITULO));
 
             char buf[10] = {0};
-            leer_cadena(wc, 3, 12, buf, 9);
+            leer_cadena(wc, 3, 21, buf, 9);
             int cant = atoi(buf);
             delwin(wc);
 
             if (cant <= 0 || cant > lista[selec].stock) {
-                mostrar_mensaje("Cantidad invalida o excede el stock.", 1);
+                mostrar_mensaje("ERR_INVALID_VAL", 1);
                 esperar_enter();
             } else {
                 *cantidad_out = cant;
@@ -417,8 +455,7 @@ int pantalla_catalogo(struct Productos *lista, int total, int *cantidad_out) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   PANTALLA: Carrito de compras
-   Retorna 1 si el usuario confirma compra, 0 si cancela
+   PANTALLA: Carrito de compras (Estilo Matrix)
    ══════════════════════════════════════════════════════════════ */
 int pantalla_carrito(struct Productos *carrito, int total, float costo_total) {
     int filas, cols;
@@ -431,15 +468,15 @@ int pantalla_carrito(struct Productos *carrito, int total, float costo_total) {
 
     WINDOW *w = newwin(alto, ancho, y0, x0);
     keypad(w, TRUE);
-    dibujar_ventana(w, "TU CARRITO DE COMPRAS");
+    dibujar_ventana(w, "SHOPPING_CART");
 
     wattron(w, COLOR_PAIR(COLOR_BORDE) | A_BOLD);
-    mvwprintw(w, 1, 2, "ID  %-28s %-14s  Precio", "TITULO", "PLATAFORMA");
+    mvwprintw(w, 1, 2, "ID  %-28s %-14s  PRICE", "TITLE", "PLATFORM");
     wattroff(w, COLOR_PAIR(COLOR_BORDE) | A_BOLD);
 
     for (int i = 0; i < total; i++) {
         wattron(w, COLOR_PAIR(COLOR_NORMAL));
-        mvwprintw(w, 2 + i, 2, "%-3d %-28s %-14s $%7.2f",
+        mvwprintw(w, 2 + i, 2, "%-3d %-28.28s %-14.14s $%7.2f",
                   carrito[i].id, carrito[i].nombre, carrito[i].plataforma, carrito[i].precio);
         wattroff(w, COLOR_PAIR(COLOR_NORMAL));
     }
@@ -447,14 +484,14 @@ int pantalla_carrito(struct Productos *carrito, int total, float costo_total) {
     wrefresh(w);
 
     wattron(w, COLOR_PAIR(COLOR_OK) | A_BOLD);
-    mvwprintw(w, 2 + total + 1, 2, "TOTAL A PAGAR: $%.2f", costo_total);
+    mvwprintw(w, 2 + total + 1, 2, "TOTAL_DUE: $%.2f", costo_total);
     wattroff(w, COLOR_PAIR(COLOR_OK) | A_BOLD);
 
     /* Confirmación con mini-menú */
     WINDOW *wm = newwin(7, 36, y0 + alto/2, x0 + 16);
     keypad(wm, TRUE);
-    const char *opts[] = {"Confirmar compra", "Cancelar"};
-    int r = menu_navegar(wm, opts, 2, "¿Proceder?");
+    const char *opts[] = {"Confirm", "Cancel"};
+    int r = menu_navegar(wm, opts, 2, "PROCEED?");
     delwin(wm);
     delwin(w);
     clear();
@@ -508,13 +545,8 @@ void pantalla_texto(const char *titulo, const char *texto) {
     clear();
     refresh();
 }
-
 /* ══════════════════════════════════════════════════════════════
-   PANTALLA: Formulario genérico de 1-4 campos
-   campos[]  = etiquetas
-   valores[] = buffers de salida
-   maxlen[]  = longitud máxima de cada campo
-   es_pass[] = 1 si el campo es contraseña (oculta con *)
+   PANTALLA: Formulario genérico (Estilo Matrix)
    ══════════════════════════════════════════════════════════════ */
 int pantalla_formulario(const char *titulo, const char **campos, char **valores, 
                         const int *maxlen, const int *es_pass, int n_campos) 
@@ -528,24 +560,36 @@ int pantalla_formulario(const char *titulo, const char **campos, char **valores,
 
     int exito = 1;
     for (int i = 0; i < n_campos; i++) {
-        mvwprintw(w, 2 + i * 3, 2, "%s (q para salir):", campos[i]);
+        /* Estilo prompt de sistema */
+        wattron(w, COLOR_PAIR(COLOR_TITULO));
+        mvwprintw(w, 2 + i * 3, 2, "> %s:", campos[i]);
+        wattroff(w, COLOR_PAIR(COLOR_TITULO));
+        
+        /* Instrucción de salida discreta */
+        wattron(w, A_DIM);
+        mvwprintw(w, 2 + i * 3, 2 + (int)strlen(campos[i]) + 4, "[q to abort]");
+        wattroff(w, A_DIM);
+
         if (es_pass[i])
             exito = leer_password(w, 3 + i * 3, 2, valores[i], maxlen[i]);
         else
             exito = leer_cadena(w, 3 + i * 3, 2, valores[i], maxlen[i]);
         
-        if (!exito) break; // Sale del bucle si el usuario escribió 'q'
+        if (!exito) break;
     }
 
     delwin(w);
     clear(); refresh();
-    return exito; // Retorna 0 si canceló, 1 si terminó todo
+    return exito;
 }
 
 /* ══════════════════════════════════════════════════════════════
    MAIN
    ══════════════════════════════════════════════════════════════ */
 int main(void) {
+
+
+
     /* ── Semáforos y memoria compartida ──────────────────────── */
     key_t llave        = ftok("archivo", 'k');
     key_t llave_cliente = ftok("archivo", 'c');
@@ -584,12 +628,7 @@ int main(void) {
     keypad(stdscr, TRUE);
 
     /* Definir pares de color */
-    init_pair(COLOR_TITULO, COLOR_CYAN,   COLOR_BLACK);
-    init_pair(COLOR_NORMAL, COLOR_WHITE,  COLOR_BLACK);
-    init_pair(COLOR_SELEC,  COLOR_BLACK,  COLOR_CYAN);
-    init_pair(COLOR_ERROR,  COLOR_RED,    COLOR_BLACK);
-    init_pair(COLOR_OK,     COLOR_GREEN,  COLOR_BLACK);
-    init_pair(COLOR_BORDE,  COLOR_YELLOW, COLOR_BLACK);
+    inicializar_colores();
 
     int sesion_iniciada = 0;
     char usuario_actual[50] = {0};

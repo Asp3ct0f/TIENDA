@@ -1,0 +1,8 @@
+Fecha: 2026-05-28
+
+Usuario: ANGEL
+
+=== DETALLE DE COMPRA ===
+1;Halo Infinite;Xbox Series X;1199.00
+2;God of War Ragnarok;PlayStation 5;1349.00
+------------------------------------

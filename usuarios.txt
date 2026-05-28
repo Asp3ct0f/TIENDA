@@ -50,9 +50,9 @@ Usuario: Citlalli
 Password: 7572244276138515
 Correo: citla@gmail.com
 ------------------------------------
-Usuario: q
-Password: 6383402998
-Correo: citla@gmail.com
+Usuario: angel
+Password: 249811608802692345
+Correo: angel@gmail.com
 ------------------------------------
 Usuario: Hugo
 Password: 210715206008
@@ -69,4 +69,20 @@ Correo: a@gmail.com
 Usuario: Anselmo
 Password: 229459559077332
 Correo: anselmo@gmail.com
+------------------------------------
+Usuario: Anselmo
+Password: 6383402998
+Correo: anselmo@gmail.com
+------------------------------------
+Usuario: angel
+Password: 249811608802692345
+Correo: angel@gmail.com
+------------------------------------
+Usuario: angel
+Password: 6383402998
+Correo: angel@gmail.com
+------------------------------------
+Usuario: ANGEL
+Password: 193432059
+Correo: ANGEL@GMAIL.COM
 ------------------------------------

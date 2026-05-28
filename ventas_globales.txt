@@ -77,3 +77,41 @@ Usuario: Alondrx
 === DETALLE DE COMPRA ===
 2;God of War Ragnarok;PlayStation 5;1349.00
 ------------------------------------
+Fecha: 2026-05-27
+
+Usuario: Angel
+
+=== DETALLE DE COMPRA ===
+1;Halo Infinite;Xbox Series X;1199.00
+1;Halo Infinite;Xbox Series X;1199.00
+------------------------------------
+Fecha: 2026-05-27
+
+Usuario: angel
+
+=== DETALLE DE COMPRA ===
+7;Super Mario Bros. Wonder;Nintendo Switch;1200.00
+------------------------------------
+Fecha: 2026-05-27
+
+Usuario: angel
+
+=== DETALLE DE COMPRA ===
+1;Halo Infinite;Xbox Series X;1199.00
+------------------------------------
+Fecha: 2026-05-27
+
+Usuario: Angel
+
+=== DETALLE DE COMPRA ===
+1;Halo Infinite;Xbox Series X;1199.00
+3;The Legend of Zelda: Tears of the Kingdom;Nintendo Switch;1499.00
+------------------------------------
+Fecha: 2026-05-28
+
+Usuario: ANGEL
+
+=== DETALLE DE COMPRA ===
+1;Halo Infinite;Xbox Series X;1199.00
+2;God of War Ragnarok;PlayStation 5;1349.00
+------------------------------------
