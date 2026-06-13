@@ -1,0 +1,30 @@
+Fecha: 2026-06-13
+
+Usuario: a
+
+=== DETALLE DE COMPRA ===
+1;Halo Infinite;Xbox Series X;1199.00
+1;Halo Infinite;Xbox Series X;1199.00
+------------------------------------
+Fecha: 2026-06-13
+
+Usuario: a
+
+=== DETALLE DE COMPRA ===
+1;Halo Infinite;Xbox Series X;1199.00
+------------------------------------
+Fecha: 2026-06-13
+
+Usuario: a
+
+=== DETALLE DE COMPRA ===
+2;God of War Ragnarok;PlayStation 5;1349.00
+2;God of War Ragnarok;PlayStation 5;1349.00
+------------------------------------
+Fecha: 2026-06-13
+
+Usuario: a
+
+=== DETALLE DE COMPRA ===
+2;God of War Ragnarok;PlayStation 5;1349.00
+------------------------------------
