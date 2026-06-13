@@ -1,7 +1,0 @@
-Fecha: 2026-05-27
-
-Usuario: Lalo
-
-=== DETALLE DE COMPRA ===
-11;Pragmata;PC;1299.00
-------------------------------------
