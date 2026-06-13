@@ -150,3 +150,31 @@ Usuario: ANGEL EMANUEL
 Password: 7570801189684674
 Correo: angel@gmail.com
 ------------------------------------
+Usuario: Angel Emanuel
+Password: 229418217869214
+Correo: Angel@GMAIL.com
+------------------------------------
+Usuario: Angel
+Password: 229416965536638
+Correo: angel@gmail.com
+------------------------------------
+Usuario: PEPE
+Password: 177653
+Correo: pepe@gmail.com
+------------------------------------
+Usuario: 
+Password: 5381
+Correo: @
+------------------------------------
+Usuario: Emanuel
+Password: 249842014891640094
+Correo: Emanuel@gmail.com
+------------------------------------
+Usuario: 
+Password: 6383402998
+Correo: 
+------------------------------------
+Usuario: 
+Password: 6383402998
+Correo: 
+------------------------------------

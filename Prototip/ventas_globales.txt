@@ -273,3 +273,17 @@ Usuario: ANGEL EMANUEL
 === DETALLE DE COMPRA ===
 4;Elden Ring;PC;999.50
 ------------------------------------
+Fecha: 2026-06-13
+
+Usuario: pepe
+
+=== DETALLE DE COMPRA ===
+4;Elden Ring;PC;999.50
+------------------------------------
+Fecha: 2026-06-13
+
+Usuario: Emanuel
+
+=== DETALLE DE COMPRA ===
+4;Elden Ring;PC;999.50
+------------------------------------

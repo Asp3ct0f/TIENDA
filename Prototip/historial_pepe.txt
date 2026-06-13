@@ -1,0 +1,7 @@
+Fecha: 2026-06-13
+
+Usuario: pepe
+
+=== DETALLE DE COMPRA ===
+4;Elden Ring;PC;999.50
+------------------------------------

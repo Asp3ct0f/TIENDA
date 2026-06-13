@@ -140,5 +140,109 @@ Producto: Minecraft
 Plataforma: PC
 Precio: 450.00
 
+Producto: Halo Infinite
+Plataforma: Xbox Series X
+Precio: 1199.00
+
+Producto: Halo Infinite
+Plataforma: Xbox Series X
+Precio: 1199.00
+
+Producto: Halo Infinite
+Plataforma: Xbox Series X
+Precio: 1199.00
+
+Producto: Halo Infinite
+Plataforma: Xbox Series X
+Precio: 1199.00
+
+Producto: Halo Infinite
+Plataforma: Xbox Series X
+Precio: 1199.00
+
+Producto: God of War Ragnarok
+Plataforma: PlayStation 5
+Precio: 1349.00
+
+Producto: God of War Ragnarok
+Plataforma: PlayStation 5
+Precio: 1349.00
+
+Producto: God of War Ragnarok
+Plataforma: PlayStation 5
+Precio: 1349.00
+
+Producto: God of War Ragnarok
+Plataforma: PlayStation 5
+Precio: 1349.00
+
+Producto: God of War Ragnarok
+Plataforma: PlayStation 5
+Precio: 1349.00
+
+Producto: God of War Ragnarok
+Plataforma: PlayStation 5
+Precio: 1349.00
+
+Producto: God of War Ragnarok
+Plataforma: PlayStation 5
+Precio: 1349.00
+
+Producto: God of War Ragnarok
+Plataforma: PlayStation 5
+Precio: 1349.00
+
+Producto: God of War Ragnarok
+Plataforma: PlayStation 5
+Precio: 1349.00
+
+Producto: God of War Ragnarok
+Plataforma: PlayStation 5
+Precio: 1349.00
+
+Producto: The Legend of Zelda: Tears of the Kingdom
+Plataforma: Nintendo Switch
+Precio: 1499.00
+
+Producto: The Legend of Zelda: Tears of the Kingdom
+Plataforma: Nintendo Switch
+Precio: 1499.00
+
+Producto: The Legend of Zelda: Tears of the Kingdom
+Plataforma: Nintendo Switch
+Precio: 1499.00
+
+Producto: The Legend of Zelda: Tears of the Kingdom
+Plataforma: Nintendo Switch
+Precio: 1499.00
+
+Producto: The Legend of Zelda: Tears of the Kingdom
+Plataforma: Nintendo Switch
+Precio: 1499.00
+
+Producto: Blob 2
+Plataforma: Wii
+Precio: 500.00
+
+Producto: Elden Ring
+Plataforma: PC
+Precio: 999.50
+
+Producto: Elden Ring
+Plataforma: PC
+Precio: 999.50
+
+Producto: Elden Ring
+Plataforma: PC
+Precio: 999.50
+
+Producto: Elden Ring
+Plataforma: PC
+Precio: 999.50
+
+Producto: Elden Ring
+Plataforma: PC
+Precio: 999.50
+
 ====================================
-TOTAL MENSUAL: 40073.50
+TOTAL MENSUAL: 72551.00

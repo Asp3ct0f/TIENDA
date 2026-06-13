@@ -212,36 +212,65 @@ void *Hilo(void *argumentos) //funcion del hilo (lo que va a hacer)
         }
     }
 
-    else if (accion_local == LOGIN) 
+   else if (accion_local == LOGIN) 
     {
-        FILE *archivo; // usamos un puntero del archivo
+        FILE *archivo; 
 
         char linea[200];
         char usuario_archivo[50];
         char password_archivo[100];
-        int usuario_correcto = 0; // banderita para indicar si las credenciales son correctas
+        char correo_archivo[70];
+        int credenciales_correctas = 0; 
+        int es_cuenta_admin = 0;
 
-        archivo = fopen("usuarios.txt", "r"); // abrimos el archivo de los usuarios en modo lectura ("r" read)
+        // Detectamos si el cliente está intentando ingresar con la cuenta maestra "admin"
+        int es_login_de_admin = (strcmp(usuario_local, "admin") == 0);
+
+        archivo = fopen("usuarios.txt", "r"); 
 
         if (archivo != NULL) 
-        { // si "encuentra" el archivo
+        { 
+            // Recorremos el archivo de forma ordenada bloque por bloque
             while (fgets(linea, sizeof(linea), archivo)) 
             {
                 if (strncmp(linea, "Usuario: ", 9) == 0) 
-                { // leemos la linea del usuario
+                {
+                    // 1. Extraemos el Usuario
+                    sscanf(linea + 9, "%49[^\n]", usuario_archivo);
+                    usuario_archivo[strcspn(usuario_archivo, "\r\n")] = 0;
 
-                    sscanf(linea + 9, "%49[^\n]", usuario_archivo); // Extraemos ignorando el prefijo
-                    usuario_archivo[strcspn(usuario_archivo, "\r\n")] = 0; // Limpieza crítica de saltos de línea
-
+                    // 2. Leemos la siguiente línea obligatoria (Password)
                     if (fgets(linea, sizeof(linea), archivo) && strncmp(linea, "Password: ", 10) == 0) 
                     {
-                        sscanf(linea + 10, "%99[^\n]", password_archivo);  // Leemos la línea siguiente que debe ser el password
-                        password_archivo[strcspn(password_archivo, "\r\n")] = 0; // Limpieza crítica de saltos de línea
+                        sscanf(linea + 10, "%99[^\n]", password_archivo);  
+                        password_archivo[strcspn(password_archivo, "\r\n")] = 0; 
+                    }
 
-                        // Verificamos credenciales
-                        if (strcmp(usuario_archivo, usuario_local) == 0 && strcmp(password_archivo, password_local) == 0) 
+                    // 3. Leemos la siguiente línea obligatoria (Correo)
+                    if (fgets(linea, sizeof(linea), archivo) && strncmp(linea, "Correo: ", 8) == 0) 
+                    {
+                        sscanf(linea + 8, "%69[^\n]", correo_archivo); 
+                        correo_archivo[strcspn(correo_archivo, "\r\n")] = 0; 
+                    }
+
+                    
+                    // CASO A: Es el Administrador Maestro
+                    if (es_login_de_admin) 
+                    {
+                        if (strcmp(usuario_archivo, "admin") == 0 && strcmp(password_archivo, password_local) == 0) 
                         {
-                            usuario_correcto = 1;
+                            credenciales_correctas = 1;
+                            es_cuenta_admin = 1; 
+                            break;
+                        }
+                    }
+                    // CASO B: Es un usuario común ingresando con su Correo
+                    else 
+                    {
+                        if (strcmp(correo_archivo, "admin") != 0 && strcmp(correo_archivo, usuario_local) == 0 && strcmp(password_archivo, password_local) == 0) 
+                        {
+                            credenciales_correctas = 1;
+                            es_cuenta_admin = 0; 
                             break;
                         }
                     }
@@ -250,23 +279,15 @@ void *Hilo(void *argumentos) //funcion del hilo (lo que va a hacer)
 
             fclose(archivo);
 
-            // Respuesta final exacta y limpia sin caracteres extrañas
-            if (usuario_correcto) 
+            if (credenciales_correctas) 
             {
                 strcpy(memoria->respuesta, "Login exitoso");
+                memoria->es_admin = es_cuenta_admin; 
+                
+                // === CAMBIO AQUÍ: Enviamos el NOMBRE real de vuelta al cliente ===
+                strcpy(memoria->usuario, usuario_archivo);
 
-		// Verificamos si el usuario que inicio sesion es administrador
-		if(strcmp(usuario_local, "admin") == 0)
-		{
-		    // Marcamos al usuario como administrador
-		    memoria->es_admin = 1;
-		}
-		else
-		{
-		    // Usuario normal
-		    memoria->es_admin = 0;
-		}
-                printf("Login correcto para: %s\n", usuario_local);
+                printf("Login correcto para: %s (Nombre real: %s)\n", usuario_local, usuario_archivo);
             } 
             else 
             {
@@ -422,53 +443,53 @@ void *Hilo(void *argumentos) //funcion del hilo (lo que va a hacer)
         {
             FILE *f_hist = fopen(archivo_hist, "a"); // abrimos historial en modo append
             
-	    // Archivo global de ventas
-	    FILE *f_global = fopen("ventas_globales.txt", "a");
-	    if (f_hist != NULL && f_global != NULL)
+        // Archivo global de ventas
+        FILE *f_global = fopen("ventas_globales.txt", "a");
+        if (f_hist != NULL && f_global != NULL)
             {
                 char linea[250];
                 // VARIABLES PARA OBTENER FECHA ACTUAL
-		time_t tiempo_actual;
+        time_t tiempo_actual;
 
-		struct tm *info_tiempo;
+        struct tm *info_tiempo;
 
-		char fecha[50];
-
-
-		// OBTENEMOS FECHA ACTUAL
-		time(&tiempo_actual);
-
-		info_tiempo = localtime(&tiempo_actual);
+        char fecha[50];
 
 
-		// FORMATO DE FECHA
-		strftime(fecha, sizeof(fecha), "%Y-%m-%d", info_tiempo);
-		fprintf(f_hist, "Fecha: %s\n\n", fecha);
-		// Guardamos fecha en ventas globales
-		fprintf(f_global, "Fecha: %s\n\n", fecha);
+        // OBTENEMOS FECHA ACTUAL
+        time(&tiempo_actual);
+
+        info_tiempo = localtime(&tiempo_actual);
 
 
-		// Guardamos usuario
-		fprintf(f_hist, "Usuario: %s\n\n", usuario_local);
-		// Guardamos usuario en ventas globales
-		fprintf(f_global, "Usuario: %s\n\n", usuario_local);
+        // FORMATO DE FECHA
+        strftime(fecha, sizeof(fecha), "%Y-%m-%d", info_tiempo);
+        fprintf(f_hist, "Fecha: %s\n\n", fecha);
+        // Guardamos fecha en ventas globales
+        fprintf(f_global, "Fecha: %s\n\n", fecha);
 
-		// TITULO DEL DETALLE
-		fprintf(f_hist, "=== DETALLE DE COMPRA ===\n");
-		// Titulo para ventas globales
-		fprintf(f_global, "=== DETALLE DE COMPRA ===\n");
+
+        // Guardamos usuario
+        fprintf(f_hist, "Usuario: %s\n\n", usuario_local);
+        // Guardamos usuario en ventas globales
+        fprintf(f_global, "Usuario: %s\n\n", usuario_local);
+
+        // TITULO DEL DETALLE
+        fprintf(f_hist, "=== DETALLE DE COMPRA ===\n");
+        // Titulo para ventas globales
+        fprintf(f_global, "=== DETALLE DE COMPRA ===\n");
                 while (fgets(linea, sizeof(linea), f_car))  //vamos linea por linea
                 {
                     fprintf(f_hist, "%s", linea); // copiamos cada producto al historial
-			// Guardamos tambien en historial global
-			fprintf(f_global, "%s", linea);
+            // Guardamos tambien en historial global
+            fprintf(f_global, "%s", linea);
                 }
                 fprintf(f_hist, "------------------------------------\n");
-		// Separador en historial global
-		fprintf(f_global, "------------------------------------\n");
+        // Separador en historial global
+        fprintf(f_global, "------------------------------------\n");
                 fclose(f_hist); //cerramos historial
-		// Cerramos historial global
-		fclose(f_global);
+        // Cerramos historial global
+        fclose(f_global);
                 fclose(f_car); //cerramos carrito
 
                 remove(archivo_car); // borramos el archivo del carrito (simular que se pago)
@@ -486,10 +507,10 @@ void *Hilo(void *argumentos) //funcion del hilo (lo que va a hacer)
         }
     }
 
-	else if (accion_local == BUSCAR_PRODUCTO)
-	{
-    		BuscarProducto(memoria);
-	}
+    else if (accion_local == BUSCAR_PRODUCTO)
+    {
+            BuscarProducto(memoria);
+    }
 
     //FUNCION PARA VER EL HISTORIAL 
     else if (accion_local == VER_HISTORIAL) 
@@ -524,175 +545,152 @@ void *Hilo(void *argumentos) //funcion del hilo (lo que va a hacer)
             VerUsuarios(memoria);
         }
 
-	// FUNCION PARA CREAR USUARIO DESDE ADMIN
-	else if(accion_local == CREAR_USUARIO_ADMIN)
-	{
+    // FUNCION PARA CREAR USUARIO DESDE ADMIN
+    else if(accion_local == CREAR_USUARIO_ADMIN)
+    {
 
-	    FILE *archivo;
+        FILE *archivo;
 
-	    char password_cifrada[100];
-
-
-	    // Ciframos password
-	    contrasenacif(password_local, password_cifrada);
+        char password_cifrada[100];
 
 
-	    // Abrimos archivo en modo agregar
-	    archivo = fopen("usuarios.txt", "a");
+        // Ciframos password
+        contrasenacif(password_local, password_cifrada);
 
 
-	    // Verificamos si se pudo abrir
-	    if(archivo != NULL)
-	    {
-
-	        // Escribimos los datos del usuario dentro del archivo
-		fprintf(archivo,"Usuario: %s\n", usuario_local);
-
-		fprintf(archivo,"Password: %s\n", password_cifrada);
-
-		fprintf(archivo,"Correo: %s\n", correo_local);
-
-		fprintf(archivo,"------------------------------------\n");
-
-	        fclose(archivo);
+        // Abrimos archivo en modo agregar
+        archivo = fopen("usuarios.txt", "a");
 
 
-	        // Mandamos respuesta exitosa
-	        strcpy(memoria->respuesta, "Usuario creado correctamente");
-	    }
-	    else
-	    {
+        // Verificamos si se pudo abrir
+        if(archivo != NULL)
+        {
 
-	        // Error al abrir archivo
-	        strcpy(memoria->respuesta, "Error al crear usuario");
-	    }
-	}
+            // Escribimos los datos del usuario dentro del archivo
+        fprintf(archivo,"Usuario: %s\n", usuario_local);
+
+        fprintf(archivo,"Password: %s\n", password_cifrada);
+
+        fprintf(archivo,"Correo: %s\n", correo_local);
+
+        fprintf(archivo,"------------------------------------\n");
+
+            fclose(archivo);
+
+
+            // Mandamos respuesta exitosa
+            strcpy(memoria->respuesta, "Usuario creado correctamente");
+        }
+        else
+        {
+
+            // Error al abrir archivo
+            strcpy(memoria->respuesta, "Error al crear usuario");
+        }
+    }
     
-	// FUNCION PARA MODIFICAR USUARIO
-	else if(accion_local == MODIFICAR_USUARIO)
-	{
+    // FUNCION PARA MODIFICAR USUARIO
+    else if(accion_local == MODIFICAR_USUARIO)
+{
+    FILE *archivo;
+    FILE *temp;
 
-	    FILE *archivo;
-	    FILE *temp;
+    char linea[300];
+    char usuario_archivo[100];
+    char password_archivo[100];
+    char correo_archivo[100];
 
+    int encontrado = 0;
+    int usuario_duplicado = 0;
 
-	    char linea[300];
+    // Solo la copiamos directamente la contrasena
+    char password_cifrada[100];
+    strncpy(password_cifrada, password_local, 99);
 
-	    char usuario_archivo[100];
+    // Si el admin esta cambiando el nombre tenemos que verificar que ese nuevo nombre no lo tenga alguien más.
+    if (strcmp(memoria->mensaje, usuario_local) != 0) {
+        archivo = fopen("usuarios.txt", "r");
+        if (archivo != NULL) {
+            while (fgets(linea, sizeof(linea), archivo)) {
+                if (strstr(linea, "Usuario: ") != NULL) {
+                    sscanf(linea, "Usuario: %[^\n]", usuario_archivo);
+                    if (strcmp(usuario_archivo, usuario_local) == 0) {
+                        usuario_duplicado = 1;
+                        break;
+                    }
+                }
+            }
+            fclose(archivo);
+        }
+    }
 
-	    char password_archivo[100];
+    // Si el nombre de usuario ya está ocupado, rebotamos la petición
+    if (usuario_duplicado) {
+        strcpy(memoria->respuesta, "ERROR: El nuevo nombre de usuario ya está en uso por otra cuenta.");
+    } 
+    else {
+        // Abrimos los archivos para la sustitución de datos
+        archivo = fopen("usuarios.txt", "r");
+        temp = fopen("temp.txt", "w");
 
-	    char correo_archivo[100];
+        if(archivo == NULL || temp == NULL) {
+            strcpy(memoria->respuesta, "ERROR: No se pudieron abrir los archivos en el servidor.");
+            if(archivo) fclose(archivo);
+            if(temp) fclose(temp);
+        } 
+        else {
+            // Recorremos archivo linea por linea
+            while(fgets(linea, sizeof(linea), archivo)) {
+                if(strstr(linea, "Usuario: ") != NULL) {
+                    sscanf(linea, "Usuario: %[^\n]", usuario_archivo);
 
+                    // Leemos el resto del bloque del usuario actual
+                    fgets(linea, sizeof(linea), archivo);
+                    sscanf(linea, "Password: %[^\n]", password_archivo);
 
-	    int encontrado = 0;
+                    fgets(linea, sizeof(linea), archivo);
+                    sscanf(linea, "Correo: %[^\n]", correo_archivo);
 
+                    fgets(linea, sizeof(linea), archivo); // Separador
 
-	    char password_cifrada[100];
+                    // Verificamos si es el usuario que el admin quiere modificar
+                    if(strcmp(usuario_archivo, memoria->mensaje) == 0) {
+                        encontrado = 1;
 
+                        // Escribimos los datos actualizados
+                        fprintf(temp, "Usuario: %s\n", usuario_local);
+                        fprintf(temp, "Password: %s\n", password_cifrada);
+                        fprintf(temp, "Correo: %s\n", correo_local);
+                        fprintf(temp, "------------------------------------\n");
+                    } 
+                    else {
+                        // Reescribimos el usuario original sin cambios
+                        fprintf(temp, "Usuario: %s\n", usuario_archivo);
+                        fprintf(temp, "Password: %s\n", password_archivo);
+                        fprintf(temp, "Correo: %s\n", correo_archivo);
+                        fprintf(temp, "------------------------------------\n");
+                    }
+                }
+            }
 
-	    // Ciframos nueva password
-	    contrasenacif(password_local, password_cifrada);
+            fclose(archivo);
+            fclose(temp);
 
-
-	    // Abrimos archivo original
-	    archivo = fopen("usuarios.txt", "r");
-
-
-	    // Creamos archivo temporal
-	    temp = fopen("temp.txt", "w");
-	
-
-	    // Verificamos archivos
-	    if(archivo == NULL || temp == NULL)
-	    {
-	        strcpy(memoria->respuesta, "Error al abrir archivos");
-	   }
-	    else
-	    {
-
-	        // Recorremos archivo linea por linea
-	        while(fgets(linea, sizeof(linea), archivo))
-	        {
-
-	            // Verificamos linea usuario
-	            if(strstr(linea, "Usuario: ") != NULL)
-	            {
-
-	                sscanf(linea, "Usuario: %[^\n]", usuario_archivo);
-
-
-	                // Leemos password
-	                fgets(linea, sizeof(linea), archivo);
-	                sscanf(linea, "Password: %[^\n]", password_archivo);
-
-
-	                // Leemos correo
-	                fgets(linea, sizeof(linea), archivo);
-	                sscanf(linea, "Correo: %[^\n]", correo_archivo);
-
-
-	                // Leemos separador
-	                fgets(linea, sizeof(linea), archivo);
-
-
-	                // Verificamos usuario a modificar
-	                if(strcmp(usuario_archivo, memoria->mensaje) == 0)
-	                {
-
-	                    encontrado = 1;
-
-
-	                    // Escribimos nuevos datos
-	                    fprintf(temp,"Usuario: %s\n", usuario_local);
-
-	                    fprintf(temp,"Password: %s\n", password_cifrada);
-
-	                    fprintf(temp,"Correo: %s\n", correo_local);
-
-	                    fprintf(temp,"------------------------------------\n");
-	                }
-	                else
-	                {
-
-	                    // Reescribimos usuario original
-	                    fprintf(temp,"Usuario: %s\n", usuario_archivo);
-
-	                    fprintf(temp,"Password: %s\n", password_archivo);
-
-	                    fprintf(temp,"Correo: %s\n", correo_archivo);
-
-	                    fprintf(temp,"------------------------------------\n");
-        	        }
-	            }
-	        }
-
-
-	        fclose(archivo);
-
-	        fclose(temp);
-
-
-	        // Eliminamos archivo viejo
-	        remove("usuarios.txt");
-
-
-	        // Renombramos temporal
-        	rename("temp.txt", "usuarios.txt");
-
-
-	        // Verificamos resultado
-	        if(encontrado)
-	        {
-	            strcpy(memoria->respuesta, "Usuario modificado correctamente");
-	        }
-	        else
-	        {
-	            strcpy(memoria->respuesta, "Usuario no encontrado");
-	        }
-	    }
-	}
-	// FUNCION PARA ELIMINAR USUARIO
+            // 3. CONTROL DE ARCHIVOS SEGURO:
+            // Solo reemplazamos el archivo real si verdaderamente hubo una modificación
+            if(encontrado) {
+                remove("usuarios.txt");
+                rename("temp.txt", "usuarios.txt");
+                strcpy(memoria->respuesta, "Usuario modificado correctamente");
+            } 
+            else {
+                remove("temp.txt"); // Descartamos el temporal si no se editó nada
+                strcpy(memoria->respuesta, "ERROR: Usuario objetivo no encontrado");
+            }
+        }
+    }
+}
+    // FUNCION PARA ELIMINAR USUARIO
 else if(accion_local == ELIMINAR_USUARIO)
 {
 
@@ -839,8 +837,8 @@ else if(accion_local == REPORTE_DIARIO)
 
     strftime(fecha_actual, sizeof(fecha_actual), "%Y-%m-%d", info_tiempo);
 
-	// Abrimos historial global de ventas
-	historial = fopen("ventas_globales.txt", "r");
+    // Abrimos historial global de ventas
+    historial = fopen("ventas_globales.txt", "r");
 
 
     // Verificamos historial
@@ -860,14 +858,14 @@ else if(accion_local == REPORTE_DIARIO)
 
         fprintf(reporte, "Fecha: %s\n\n", fecha_actual);
 
-	// Guardamos mensaje final con el reporte
-	sprintf(memoria->respuesta,
+    // Guardamos mensaje final con el reporte
+    sprintf(memoria->respuesta,
         "Reporte diario generado correctamente");
 
-	// Limpiamos memoria de productos
-	strcpy(memoria->productos, "");
+    // Limpiamos memoria de productos
+    strcpy(memoria->productos, "");
         
-	// Recorremos historial
+    // Recorremos historial
         while(fgets(linea, sizeof(linea), historial))
         {
 
@@ -889,14 +887,14 @@ else if(accion_local == REPORTE_DIARIO)
            plataforma,
            &precio);
 
-	// Guardamos tambien en memoria para mostrarlo en consola
-	sprintf(linea,
+    // Guardamos tambien en memoria para mostrarlo en consola
+    sprintf(linea,
         "Producto: %s\nPlataforma: %s\nPrecio: %.2f\n\n",
         nombre,
         plataforma,
         precio);
 
-	strcat(memoria->productos, linea);
+    strcat(memoria->productos, linea);
     // Sumamos venta
     total_ventas += precio;
 
@@ -914,16 +912,16 @@ else if(accion_local == REPORTE_DIARIO)
         fprintf(reporte,
         "====================================\n");
 
-	fprintf(reporte,
+    fprintf(reporte,
         "TOTAL VENDIDO: %.2f\n",
         total_ventas);
 
-	// Guardamos total en memoria
-	sprintf(linea,
+    // Guardamos total en memoria
+    sprintf(linea,
         "====================================\nTOTAL VENDIDO: %.2f\n",
         total_ventas);
 
-	strcat(memoria->productos, linea);
+    strcat(memoria->productos, linea);
 
         fclose(historial);
 
@@ -1213,7 +1211,7 @@ else if(accion_local == AGREGAR_PRODUCTO_ADMIN)
     }
     else
     {
-	// Revisamos si el ID ya existe
+    // Revisamos si el ID ya existe
 while(fgets(linea, sizeof(linea), archivo))
 {
 
@@ -1246,10 +1244,10 @@ if(repetido)
 }
 else
 {
-	// Reabrimos archivo en modo append
-	fclose(archivo);
+    // Reabrimos archivo en modo append
+    fclose(archivo);
 
-	archivo = fopen("productos.txt", "a");
+    archivo = fopen("productos.txt", "a");
         // Guardamos producto
         fprintf(archivo,
                 "%d;%s;%s;%.2f;%d\n",
@@ -1266,7 +1264,7 @@ else
         strcpy(memoria->respuesta,
                "Producto agregado correctamente");
     }
-	}
+    }
 }
 
 // FUNCION PARA MODIFICAR STOCK
@@ -1498,152 +1496,100 @@ else if(accion_local == ELIMINAR_PRODUCTO)
 // FUNCION PARA MODIFICAR MI CUENTA
 else if(accion_local == MODIFICAR_MI_CUENTA)
 {
-
     FILE *archivo;
-
     FILE *temp;
 
-
     char linea[300];
-
     char usuario_archivo[100];
-
     char password_archivo[100];
-
     char correo_archivo[100];
 
-
     int encontrado = 0;
+    int usuario_duplicado = 0;
 
-
+    // Como el cliente ya envía la contraseña cifrada, la copiamos.
     char password_cifrada[100];
+    strncpy(password_cifrada, password_local, 99);
 
-
-    // Ciframos nueva password
-    contrasenacif(password_local, password_cifrada);
-
-
-    // Abrimos archivo original
-    archivo = fopen("usuarios.txt", "r");
-
-
-    // Creamos temporal
-    temp = fopen("temp.txt", "w");
-
-
-    // Verificamos archivos
-    if(archivo == NULL || temp == NULL)
-    {
-
-        strcpy(memoria->respuesta,
-               "Error al abrir archivos");
-    }
-    else
-    {
-
-        // Recorremos archivo
-        while(fgets(linea, sizeof(linea), archivo))
-        {
-
-            // Detectamos usuario
-            if(strstr(linea, "Usuario: ") != NULL)
-            {
-
-                sscanf(linea,
-                       "Usuario: %[^\n]",
-                       usuario_archivo);
-
-
-                // Leemos password
-                fgets(linea, sizeof(linea), archivo);
-                sscanf(linea,
-                       "Password: %[^\n]",
-                       password_archivo);
-
-
-                // Leemos correo
-                fgets(linea, sizeof(linea), archivo);
-                sscanf(linea,
-                       "Correo: %[^\n]",
-                       correo_archivo);
-
-
-                // Leemos separador
-                fgets(linea, sizeof(linea), archivo);
-
-
-                // Verificamos usuario actual
-                if(strcmp(usuario_archivo,
-                          memoria->mensaje) == 0)
-                {
-
-                    encontrado = 1;
-
-
-                    // Escribimos nuevos datos
-                    fprintf(temp,
-                            "Usuario: %s\n",
-                            usuario_local);
-
-                    fprintf(temp,
-                            "Password: %s\n",
-                            password_cifrada);
-
-                    fprintf(temp,
-                            "Correo: %s\n",
-                            correo_local);
-
-                    fprintf(temp,
-                            "------------------------------------\n");
-                }
-                else
-                {
-
-                    // Reescribimos usuario normal
-                    fprintf(temp,
-                            "Usuario: %s\n",
-                            usuario_archivo);
-
-                    fprintf(temp,
-                            "Password: %s\n",
-                            password_archivo);
-
-                    fprintf(temp,
-                            "Correo: %s\n",
-                            correo_archivo);
-
-                    fprintf(temp,
-                            "------------------------------------\n");
+    // Verificar si el NUEVO usuario ya existe en el archivo
+    // Solo validamos si el usuario realmente está intentando CAMBIAR su nombre de usuario
+    if (strcmp(memoria->mensaje, usuario_local) != 0) {
+        archivo = fopen("usuarios.txt", "r");
+        if (archivo != NULL) {
+            while (fgets(linea, sizeof(linea), archivo)) {
+                if (strstr(linea, "Usuario: ") != NULL) {
+                    sscanf(linea, "Usuario: %[^\n]", usuario_archivo);
+                    if (strcmp(usuario_archivo, usuario_local) == 0) {
+                        usuario_duplicado = 1;
+                        break;
+                    }
                 }
             }
+            fclose(archivo);
         }
+    }
 
+    // Si el usuario ya existe en el sistema, cancelamos todo
+    if (usuario_duplicado) {
+        strcpy(memoria->respuesta, "ERROR: El nuevo nombre de usuario ya está en uso.");
+    } 
+    else {
+        // Abrimos archivo original para reescribir
+        archivo = fopen("usuarios.txt", "r");
+        temp = fopen("temp.txt", "w");
 
-        fclose(archivo);
+        if(archivo == NULL || temp == NULL) {
+            strcpy(memoria->respuesta, "ERROR: Error al abrir archivos en el servidor");
+            if(archivo) fclose(archivo);
+            if(temp) fclose(temp);
+        } 
+        else {
+            // Recorremos archivo
+            while(fgets(linea, sizeof(linea), archivo)) {
+                if(strstr(linea, "Usuario: ") != NULL) {
+                    sscanf(linea, "Usuario: %[^\n]", usuario_archivo);
 
-        fclose(temp);
+                    // Leemos el resto de los datos del bloque actual
+                    fgets(linea, sizeof(linea), archivo);
+                    sscanf(linea, "Password: %[^\n]", password_archivo);
 
+                    fgets(linea, sizeof(linea), archivo);
+                    sscanf(linea, "Correo: %[^\n]", correo_archivo);
 
-        // Si encontramos usuario
-        if(encontrado)
-        {
+                    fgets(linea, sizeof(linea), archivo); // Separador
 
-            remove("usuarios.txt");
+                    // Verificamos si es el usuario que quiere modificar (antiguo nombre)
+                    if(strcmp(usuario_archivo, memoria->mensaje) == 0) {
+                        encontrado = 1;
 
-            rename("temp.txt", "usuarios.txt");
+                        // Escribimos los NUEVOS datos
+                        fprintf(temp, "Usuario: %s\n", usuario_local);
+                        fprintf(temp, "Password: %s\n", password_cifrada);
+                        fprintf(temp, "Correo: %s\n", correo_local);
+                        fprintf(temp, "------------------------------------\n");
+                    } 
+                    else {
+                        // Reescribimos los datos del usuario tal y como estaban
+                        fprintf(temp, "Usuario: %s\n", usuario_archivo);
+                        fprintf(temp, "Password: %s\n", password_archivo);
+                        fprintf(temp, "Correo: %s\n", correo_archivo);
+                        fprintf(temp, "------------------------------------\n");
+                    }
+                }
+            }
 
+            fclose(archivo);
+            fclose(temp);
 
-            strcpy(memoria->respuesta,
-                   "Cuenta modificada correctamente");
-        }
-        else
-        {
-
-            remove("temp.txt");
-
-
-            strcpy(memoria->respuesta,
-                   "Usuario no encontrado");
+            if(encontrado) {
+                remove("usuarios.txt");
+                rename("temp.txt", "usuarios.txt");
+                strcpy(memoria->respuesta, "Cuenta modificada correctamente");
+            } 
+            else {
+                remove("temp.txt");
+                strcpy(memoria->respuesta, "ERROR: Usuario original no encontrado");
+            }
         }
     }
 }
@@ -1653,12 +1599,12 @@ else
         printf("Operacion desconocida\n"); //por si eligen otra fuera del rango
     }
 
-	    // HACEMOS UP AL SEMAFORO DEL CLIENTE PARA DESPERTARLO YA QUE TERMINAMOS DE ESCRIBIR LA RESPUESTA
-	    struct sembuf op_v[] = {{0, 1, 0}};
-	    semop(semaforo_cliente, op_v, 1);
+        // HACEMOS UP AL SEMAFORO DEL CLIENTE PARA DESPERTARLO YA QUE TERMINAMOS DE ESCRIBIR LA RESPUESTA
+        struct sembuf op_v[] = {{0, 1, 0}};
+        semop(semaforo_cliente, op_v, 1);
 
-	    pthread_exit(NULL); //cerramos la funcion del hilo
-	}
+        pthread_exit(NULL); //cerramos la funcion del hilo
+    }
 
 
 void down(int semid) //funcion para hacser down al semaforo
@@ -1787,7 +1733,7 @@ void VerUsuarios(struct Datos *memoria)
 
     char linea[300]; // Guardamos cada linea del archivo
 
-    char resultados[3000] = ""; // Aqui guardaremos todos los usuarios
+    char resultados[5000] = ""; // Aqui guardaremos todos los usuarios
 
 
     // Abrimos el archivo de usuarios en modo lectura
