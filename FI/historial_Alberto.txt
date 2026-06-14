@@ -1,0 +1,14 @@
+Fecha: 2026-06-14
+
+Usuario: Alberto
+
+=== DETALLE DE COMPRA ===
+12;Blob 2;Wii;500.00
+------------------------------------
+Fecha: 2026-06-14
+
+Usuario: Alberto
+
+=== DETALLE DE COMPRA ===
+10;Spider-Man 2;PlayStation 5;1349.00
+------------------------------------

@@ -1,0 +1,7 @@
+Fecha: 2026-05-29
+
+Usuario: logan
+
+=== DETALLE DE COMPRA ===
+6;Minecraft;PC;450.00
+------------------------------------

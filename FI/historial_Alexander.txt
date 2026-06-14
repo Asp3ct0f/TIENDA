@@ -1,0 +1,16 @@
+Fecha: 2026-05-27
+
+Usuario: Alexander
+
+=== DETALLE DE COMPRA ===
+4;Elden Ring;PC;999.50
+4;Elden Ring;PC;999.50
+4;Elden Ring;PC;999.50
+4;Elden Ring;PC;999.50
+4;Elden Ring;PC;999.50
+4;Elden Ring;PC;999.50
+4;Elden Ring;PC;999.50
+4;Elden Ring;PC;999.50
+4;Elden Ring;PC;999.50
+4;Elden Ring;PC;999.50
+------------------------------------
