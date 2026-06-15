@@ -1045,7 +1045,38 @@ int pantalla_formulario_con_catalogo(const char *titulo, const char **campos, ch
     // 1. SOLICITAR CATÁLOGO ACTUALIZADO AL SERVIDOR ANTES DE DIBUJAR
     memoria->accion = VER_PRODUCTOS;
     up(semaforo);
-    down(semaforo_cliente);
+    int respuesta_recibida = 0;
+
+for(int i = 0; i < 5; i++)
+{
+    sleep(1);
+
+    if(semctl(semaforo_cliente, 0, GETVAL) > 0)
+    {
+        down(semaforo_cliente);
+
+        respuesta_recibida = 1;
+
+        break;
+    }
+}
+
+if(!respuesta_recibida)
+{
+    clear();
+
+    mvprintw(LINES/2 - 1, (COLS - 35)/2,
+             "ERROR: Servidor no disponible");
+
+    mvprintw(LINES/2 + 1, (COLS - 30)/2,
+             "Presione una tecla para continuar");
+
+    refresh();
+
+    getch();
+
+    return 0;
+}
 
     int filas, cols;
     getmaxyx(stdscr, filas, cols);
@@ -1177,7 +1208,38 @@ int main(void) {
             strncpy(memoria->correo, correo_local, 69);
 
             up(semaforo);
-            down(semaforo_cliente);
+            int respuesta_recibida = 0;
+
+for(int i = 0; i < 5; i++)
+{
+    sleep(1);
+
+    if(semctl(semaforo_cliente, 0, GETVAL) > 0)
+    {
+        down(semaforo_cliente);
+
+        respuesta_recibida = 1;
+
+        break;
+    }
+}
+
+if(!respuesta_recibida)
+{
+    clear();
+
+    mvprintw(LINES/2 - 1, (COLS - 35)/2,
+             "ERROR: Servidor no disponible");
+
+    mvprintw(LINES/2 + 1, (COLS - 30)/2,
+             "Presione una tecla para continuar");
+
+    refresh();
+
+    getch();
+
+    continue;
+}
 
             /* ═══ POPUP AÑADIDO PARA LOGIN ═══ */
             if (!es_registro) {
@@ -1226,7 +1288,38 @@ int main(void) {
                 memoria->accion = VER_PRODUCTOS;
                 strncpy(memoria->usuario, usuario_actual, 49);
                 up(semaforo);
-                down(semaforo_cliente);
+                int respuesta_recibida = 0;
+
+for(int i = 0; i < 5; i++)
+{
+    sleep(1);
+
+    if(semctl(semaforo_cliente, 0, GETVAL) > 0)
+    {
+        down(semaforo_cliente);
+
+        respuesta_recibida = 1;
+
+        break;
+    }
+}
+
+if(!respuesta_recibida)
+{
+    clear();
+
+    mvprintw(LINES/2 - 1, (COLS - 35)/2,
+             "ERROR: Servidor no disponible");
+
+    mvprintw(LINES/2 + 1, (COLS - 30)/2,
+             "Presione una tecla para continuar");
+
+    refresh();
+
+    getch();
+
+    continue;
+}
 
                 if (strcmp(memoria->respuesta, "OK") == 0) {
                     struct Productos lista[20];
@@ -1251,7 +1344,38 @@ int main(void) {
                         snprintf(memoria->productos, sizeof(memoria->productos),
                                  "%d;%d", lista[idx].id, cantidad);
                         up(semaforo);
-                        down(semaforo_cliente);
+                        int respuesta_recibida = 0;
+
+for(int i = 0; i < 5; i++)
+{
+    sleep(1);
+
+    if(semctl(semaforo_cliente, 0, GETVAL) > 0)
+    {
+        down(semaforo_cliente);
+
+        respuesta_recibida = 1;
+
+        break;
+    }
+}
+
+if(!respuesta_recibida)
+{
+    clear();
+
+    mvprintw(LINES/2 - 1, (COLS - 35)/2,
+             "ERROR: Servidor no disponible");
+
+    mvprintw(LINES/2 + 1, (COLS - 30)/2,
+             "Presione una tecla para continuar");
+
+    refresh();
+
+    getch();
+
+    continue;
+}
                         popup_mensaje(
                             strstr(memoria->respuesta, "ERROR") != NULL ? "ERROR" : "CARRITO",
                             memoria->respuesta,
@@ -1265,7 +1389,38 @@ int main(void) {
                 memoria->accion = VER_CARRITO;
                 strncpy(memoria->usuario, usuario_actual, 49);
                 up(semaforo);
-                down(semaforo_cliente);
+                int respuesta_recibida = 0;
+
+for(int i = 0; i < 5; i++)
+{
+    sleep(1);
+
+    if(semctl(semaforo_cliente, 0, GETVAL) > 0)
+    {
+        down(semaforo_cliente);
+
+        respuesta_recibida = 1;
+
+        break;
+    }
+}
+
+if(!respuesta_recibida)
+{
+    clear();
+
+    mvprintw(LINES/2 - 1, (COLS - 35)/2,
+             "ERROR: Servidor no disponible");
+
+    mvprintw(LINES/2 + 1, (COLS - 30)/2,
+             "Presione una tecla para continuar");
+
+    refresh();
+
+    getch();
+
+    continue;
+}
 
                 if (strcmp(memoria->respuesta, "OK") == 0) {
                     struct Productos carrito[50];
@@ -1289,7 +1444,38 @@ int main(void) {
                         memoria->accion = COMPRAR_CARRITO;
                         strncpy(memoria->usuario, usuario_actual, 49);
                         up(semaforo);
-                        down(semaforo_cliente);
+                        int respuesta_recibida = 0;
+
+for(int i = 0; i < 5; i++)
+{
+    sleep(1);
+
+    if(semctl(semaforo_cliente, 0, GETVAL) > 0)
+    {
+        down(semaforo_cliente);
+
+        respuesta_recibida = 1;
+
+        break;
+    }
+}
+
+if(!respuesta_recibida)
+{
+    clear();
+
+    mvprintw(LINES/2 - 1, (COLS - 35)/2,
+             "ERROR: Servidor no disponible");
+
+    mvprintw(LINES/2 + 1, (COLS - 30)/2,
+             "Presione una tecla para continuar");
+
+    refresh();
+
+    getch();
+
+    continue;
+}
                         popup_mensaje("COMPRA", memoria->respuesta, 0);
                     }
                 }
@@ -1306,7 +1492,38 @@ int main(void) {
                 memoria->accion = VER_HISTORIAL;
                 strncpy(memoria->usuario, usuario_actual, 49);
                 up(semaforo);
-                down(semaforo_cliente);
+                int respuesta_recibida = 0;
+
+for(int i = 0; i < 5; i++)
+{
+    sleep(1);
+
+    if(semctl(semaforo_cliente, 0, GETVAL) > 0)
+    {
+        down(semaforo_cliente);
+
+        respuesta_recibida = 1;
+
+        break;
+    }
+}
+
+if(!respuesta_recibida)
+{
+    clear();
+
+    mvprintw(LINES/2 - 1, (COLS - 35)/2,
+             "ERROR: Servidor no disponible");
+
+    mvprintw(LINES/2 + 1, (COLS - 30)/2,
+             "Presione una tecla para continuar");
+
+    refresh();
+
+    getch();
+
+    continue;
+}
 
                 if (strcmp(memoria->respuesta, "OK") == 0)
                     pantalla_texto("HISTORIAL DE COMPRAS", memoria->productos);
@@ -1329,7 +1546,38 @@ int main(void) {
                     strncpy(memoria->productos, buf, 199);
                     memoria->accion = BUSCAR_PRODUCTO;
                     up(semaforo);
-                    down(semaforo_cliente);
+                    int respuesta_recibida = 0;
+
+for(int i = 0; i < 5; i++)
+{
+    sleep(1);
+
+    if(semctl(semaforo_cliente, 0, GETVAL) > 0)
+    {
+        down(semaforo_cliente);
+
+        respuesta_recibida = 1;
+
+        break;
+    }
+}
+
+if(!respuesta_recibida)
+{
+    clear();
+
+    mvprintw(LINES/2 - 1, (COLS - 35)/2,
+             "ERROR: Servidor no disponible");
+
+    mvprintw(LINES/2 + 1, (COLS - 30)/2,
+             "Presione una tecla para continuar");
+
+    refresh();
+
+    getch();
+
+    continue;
+}
                     pantalla_texto("RESULTADOS DE BUSQUEDA", memoria->productos);
                 } else {
                     // Muestra el popup de aviso
@@ -1388,7 +1636,38 @@ int main(void) {
 
 
                 up(semaforo);
-                down(semaforo_cliente);
+                int respuesta_recibida = 0;
+
+for(int i = 0; i < 5; i++)
+{
+    sleep(1);
+
+    if(semctl(semaforo_cliente, 0, GETVAL) > 0)
+    {
+        down(semaforo_cliente);
+
+        respuesta_recibida = 1;
+
+        break;
+    }
+}
+
+if(!respuesta_recibida)
+{
+    clear();
+
+    mvprintw(LINES/2 - 1, (COLS - 35)/2,
+             "ERROR: Servidor no disponible");
+
+    mvprintw(LINES/2 + 1, (COLS - 30)/2,
+             "Presione una tecla para continuar");
+
+    refresh();
+
+    getch();
+
+    continue;
+}
 
 
                 if (strstr(memoria->respuesta, "ERROR") != NULL) {
@@ -1420,7 +1699,38 @@ int main(void) {
                 memoria->accion = VER_PRODUCTOS;
                 strncpy(memoria->usuario, usuario_actual, 49);
                 up(semaforo);
-                down(semaforo_cliente);
+                int respuesta_recibida = 0;
+
+for(int i = 0; i < 5; i++)
+{
+    sleep(1);
+
+    if(semctl(semaforo_cliente, 0, GETVAL) > 0)
+    {
+        down(semaforo_cliente);
+
+        respuesta_recibida = 1;
+
+        break;
+    }
+}
+
+if(!respuesta_recibida)
+{
+    clear();
+
+    mvprintw(LINES/2 - 1, (COLS - 35)/2,
+             "ERROR: Servidor no disponible");
+
+    mvprintw(LINES/2 + 1, (COLS - 30)/2,
+             "Presione una tecla para continuar");
+
+    refresh();
+
+    getch();
+
+    continue;
+}
 
                 if (strcmp(memoria->respuesta, "OK") == 0) {
                     struct Productos lista[20];
@@ -1462,7 +1772,38 @@ int main(void) {
 
                     memoria->accion = AGREGAR_PRODUCTO_ADMIN;
                     up(semaforo);
-                    down(semaforo_cliente);
+                    int respuesta_recibida = 0;
+
+for(int i = 0; i < 5; i++)
+{
+    sleep(1);
+
+    if(semctl(semaforo_cliente, 0, GETVAL) > 0)
+    {
+        down(semaforo_cliente);
+
+        respuesta_recibida = 1;
+
+        break;
+    }
+}
+
+if(!respuesta_recibida)
+{
+    clear();
+
+    mvprintw(LINES/2 - 1, (COLS - 35)/2,
+             "ERROR: Servidor no disponible");
+
+    mvprintw(LINES/2 + 1, (COLS - 30)/2,
+             "Presione una tecla para continuar");
+
+    refresh();
+
+    getch();
+
+    continue;
+}
 
                     popup_mensaje(strstr(memoria->respuesta, "ERROR") != NULL ? "ERROR" : "PRODUCTO", 
                                   memoria->respuesta, 
@@ -1493,7 +1834,38 @@ int main(void) {
                     
                     memoria->accion = MODIFICAR_STOCK;
                     up(semaforo);
-                    down(semaforo_cliente);
+                    int respuesta_recibida = 0;
+
+for(int i = 0; i < 5; i++)
+{
+    sleep(1);
+
+    if(semctl(semaforo_cliente, 0, GETVAL) > 0)
+    {
+        down(semaforo_cliente);
+
+        respuesta_recibida = 1;
+
+        break;
+    }
+}
+
+if(!respuesta_recibida)
+{
+    clear();
+
+    mvprintw(LINES/2 - 1, (COLS - 35)/2,
+             "ERROR: Servidor no disponible");
+
+    mvprintw(LINES/2 + 1, (COLS - 30)/2,
+             "Presione una tecla para continuar");
+
+    refresh();
+
+    getch();
+
+    continue;
+}
 
                     popup_mensaje(strstr(memoria->respuesta, "ERROR") != NULL ? "ERROR" : "STOCK", 
                                   memoria->respuesta, 
@@ -1522,7 +1894,38 @@ int main(void) {
                     
                     memoria->accion = ELIMINAR_PRODUCTO;
                     up(semaforo);
-                    down(semaforo_cliente);
+                    int respuesta_recibida = 0;
+
+for(int i = 0; i < 5; i++)
+{
+    sleep(1);
+
+    if(semctl(semaforo_cliente, 0, GETVAL) > 0)
+    {
+        down(semaforo_cliente);
+
+        respuesta_recibida = 1;
+
+        break;
+    }
+}
+
+if(!respuesta_recibida)
+{
+    clear();
+
+    mvprintw(LINES/2 - 1, (COLS - 35)/2,
+             "ERROR: Servidor no disponible");
+
+    mvprintw(LINES/2 + 1, (COLS - 30)/2,
+             "Presione una tecla para continuar");
+
+    refresh();
+
+    getch();
+
+    continue;
+}
 
                     popup_mensaje(strstr(memoria->respuesta, "ERROR") != NULL ? "ERROR" : "ELIMINAR", 
                                   memoria->respuesta, 
@@ -1546,7 +1949,38 @@ int main(void) {
                     memoria->accion = BUSCAR_PRODUCTO;
 
                     up(semaforo);
-                    down(semaforo_cliente);
+                    int respuesta_recibida = 0;
+
+for(int i = 0; i < 5; i++)
+{
+    sleep(1);
+
+    if(semctl(semaforo_cliente, 0, GETVAL) > 0)
+    {
+        down(semaforo_cliente);
+
+        respuesta_recibida = 1;
+
+        break;
+    }
+}
+
+if(!respuesta_recibida)
+{
+    clear();
+
+    mvprintw(LINES/2 - 1, (COLS - 35)/2,
+             "ERROR: Servidor no disponible");
+
+    mvprintw(LINES/2 + 1, (COLS - 30)/2,
+             "Presione una tecla para continuar");
+
+    refresh();
+
+    getch();
+
+    continue;
+}
 
                     pantalla_texto("RESULTADOS", memoria->productos);
                 } else {
@@ -1560,7 +1994,38 @@ int main(void) {
             else if (mi_rol_admin && opcion == 5) {
                 memoria->accion = VER_USUARIOS;
                 up(semaforo);
-                down(semaforo_cliente);
+                int respuesta_recibida = 0;
+
+for(int i = 0; i < 5; i++)
+{
+    sleep(1);
+
+    if(semctl(semaforo_cliente, 0, GETVAL) > 0)
+    {
+        down(semaforo_cliente);
+
+        respuesta_recibida = 1;
+
+        break;
+    }
+}
+
+if(!respuesta_recibida)
+{
+    clear();
+
+    mvprintw(LINES/2 - 1, (COLS - 35)/2,
+             "ERROR: Servidor no disponible");
+
+    mvprintw(LINES/2 + 1, (COLS - 30)/2,
+             "Presione una tecla para continuar");
+
+    refresh();
+
+    getch();
+
+    continue;
+}
                 pantalla_texto("USUARIOS REGISTRADOS", memoria->productos);
             }
 
@@ -1591,7 +2056,38 @@ int main(void) {
                     
                     // Sincronización IPC con el servidor
                     up(semaforo);
-                    down(semaforo_cliente);
+                    int respuesta_recibida = 0;
+
+for(int i = 0; i < 5; i++)
+{
+    sleep(1);
+
+    if(semctl(semaforo_cliente, 0, GETVAL) > 0)
+    {
+        down(semaforo_cliente);
+
+        respuesta_recibida = 1;
+
+        break;
+    }
+}
+
+if(!respuesta_recibida)
+{
+    clear();
+
+    mvprintw(LINES/2 - 1, (COLS - 35)/2,
+             "ERROR: Servidor no disponible");
+
+    mvprintw(LINES/2 + 1, (COLS - 30)/2,
+             "Presione una tecla para continuar");
+
+    refresh();
+
+    getch();
+
+    continue;
+}
 
                     // Desplegar la respuesta que devuelva el Servidor
                     popup_mensaje(
@@ -1632,7 +2128,39 @@ int main(void) {
                     
                     // Sincronización IPC con el servidor
                     up(semaforo);
-                    down(semaforo_cliente);
+                    int respuesta_recibida = 0;
+
+for(int i = 0; i < 5; i++)
+{
+    sleep(1);
+
+    if(semctl(semaforo_cliente, 0, GETVAL) > 0)
+    {
+        down(semaforo_cliente);
+
+        respuesta_recibida = 1;
+
+        break;
+    }
+}
+
+if(!respuesta_recibida)
+{
+    clear();
+
+    mvprintw(LINES/2 - 1, (COLS - 35)/2,
+             "ERROR: Servidor no disponible");
+
+    mvprintw(LINES/2 + 1, (COLS - 30)/2,
+             "Presione una tecla para continuar");
+
+    refresh();
+
+    getch();
+
+    continue;
+}
+
 
                     // Desplegar la respuesta que envíe el Servidor
                     popup_mensaje(
@@ -1673,7 +2201,38 @@ int main(void) {
 
                     // Sincronización mediante semáforos
                     up(semaforo);
-                    down(semaforo_cliente);
+                    int respuesta_recibida = 0;
+
+for(int i = 0; i < 5; i++)
+{
+    sleep(1);
+
+    if(semctl(semaforo_cliente, 0, GETVAL) > 0)
+    {
+        down(semaforo_cliente);
+
+        respuesta_recibida = 1;
+
+        break;
+    }
+}
+
+if(!respuesta_recibida)
+{
+    clear();
+
+    mvprintw(LINES/2 - 1, (COLS - 35)/2,
+             "ERROR: Servidor no disponible");
+
+    mvprintw(LINES/2 + 1, (COLS - 30)/2,
+             "Presione una tecla para continuar");
+
+    refresh();
+
+    getch();
+
+    continue;
+}
 
                     // Mostramos la respuesta devuelta por el servidor
                     popup_mensaje(
@@ -1690,7 +2249,38 @@ int main(void) {
             else if (mi_rol_admin && opcion == 9) {
                 memoria->accion = REPORTE_DIARIO;
                 up(semaforo);
-                down(semaforo_cliente);
+                int respuesta_recibida = 0;
+
+for(int i = 0; i < 5; i++)
+{
+    sleep(1);
+
+    if(semctl(semaforo_cliente, 0, GETVAL) > 0)
+    {
+        down(semaforo_cliente);
+
+        respuesta_recibida = 1;
+
+        break;
+    }
+}
+
+if(!respuesta_recibida)
+{
+    clear();
+
+    mvprintw(LINES/2 - 1, (COLS - 35)/2,
+             "ERROR: Servidor no disponible");
+
+    mvprintw(LINES/2 + 1, (COLS - 30)/2,
+             "Presione una tecla para continuar");
+
+    refresh();
+
+    getch();
+
+    continue;
+}
                 pantalla_texto("REPORTE VENTAS DIARIAS", memoria->productos);
             }
 
@@ -1698,7 +2288,38 @@ int main(void) {
             else if (mi_rol_admin && opcion == 10) {
                 memoria->accion = REPORTE_SEMANAL;
                 up(semaforo);
-                down(semaforo_cliente);
+                int respuesta_recibida = 0;
+
+for(int i = 0; i < 5; i++)
+{
+    sleep(1);
+
+    if(semctl(semaforo_cliente, 0, GETVAL) > 0)
+    {
+        down(semaforo_cliente);
+
+        respuesta_recibida = 1;
+
+        break;
+    }
+}
+
+if(!respuesta_recibida)
+{
+    clear();
+
+    mvprintw(LINES/2 - 1, (COLS - 35)/2,
+             "ERROR: Servidor no disponible");
+
+    mvprintw(LINES/2 + 1, (COLS - 30)/2,
+             "Presione una tecla para continuar");
+
+    refresh();
+
+    getch();
+
+    continue;
+}
                 pantalla_texto("REPORTE VENTAS SEMANALES", memoria->productos);
             }
 
@@ -1706,7 +2327,38 @@ int main(void) {
             else if (mi_rol_admin && opcion == 11) {
                 memoria->accion = REPORTE_MENSUAL;
                 up(semaforo);
-                down(semaforo_cliente);
+                int respuesta_recibida = 0;
+
+for(int i = 0; i < 5; i++)
+{
+    sleep(1);
+
+    if(semctl(semaforo_cliente, 0, GETVAL) > 0)
+    {
+        down(semaforo_cliente);
+
+        respuesta_recibida = 1;
+
+        break;
+    }
+}
+
+if(!respuesta_recibida)
+{
+    clear();
+
+    mvprintw(LINES/2 - 1, (COLS - 35)/2,
+             "ERROR: Servidor no disponible");
+
+    mvprintw(LINES/2 + 1, (COLS - 30)/2,
+             "Presione una tecla para continuar");
+
+    refresh();
+
+    getch();
+
+    continue;
+}
                 pantalla_texto("REPORTE VENTAS MENSUALES", memoria->productos);
             }
 
